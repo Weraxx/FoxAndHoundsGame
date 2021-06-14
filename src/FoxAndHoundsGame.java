@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -12,7 +13,7 @@ public class FoxAndHoundsGame extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(getBoard(), 300, 275);
+        Scene scene = new Scene(getBoard(), 600, 600);
 
         primaryStage.setTitle("Board game");
         primaryStage.setScene(scene);
@@ -24,7 +25,7 @@ public class FoxAndHoundsGame extends Application {
         for (int col = 0; col < COL_COUNT; ++col) {
             for (int row = 0; row < ROW_COUNT; ++row) {
 
-                StackPane square = new StackPane();
+                StackPane field = new StackPane();
 
                 BoardSquare boardSquare;
                 if ((row + col) % 2 == 0) {
@@ -32,22 +33,39 @@ public class FoxAndHoundsGame extends Application {
                 } else {
                     boardSquare = new BoardSquare(Color.GRAY);
                 }
+                field.getChildren().add(boardSquare);
 
                 Piece piece = null;
-                if (row < 1 && (row + col) % 2 == 0) {
-                    piece = makePiece(PieceType.HOUNDS, row, col, square);
+                if ((row < 1) && ((row + col) % 2 != 0)) {
+                    piece = makePiece(PieceType.HOUNDS, row, col);
                 }
-                if (row == 7 && col == 0) {
-                    piece = makePiece(PieceType.FOX, row, col, square);
+                if ((row == 7) && (col == 0)) {
+                    piece = makePiece(PieceType.FOX, row, col);
                 }
                 boardSquare.setPiece(piece);
+                if (piece != null) {
+                    piece.radiusProperty().bind(
+                            Bindings.when(field.heightProperty().lessThan(field.widthProperty())).
+                                    then(field.heightProperty()).otherwise(field.widthProperty()).subtract(10).divide(2)
+                    );
+                    field.getChildren().add(piece);
+                }
 
-                square.getChildren().addAll(boardSquare);
+                Piece finalPiece = piece;
+                field.setOnMouseEntered(e -> {
+                    boardSquare.highlight();
+                    if (boardSquare.hasPiece()) {
+                        if (finalPiece.getType() == PieceType.FOX) {
+                            // PODSWIETLA MOZLIWE RUCHY DLA FOXA
+                        } else {
+                            // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
+                        }
 
-                square.setOnMouseEntered(e -> boardSquare.highlight());
-                square.setOnMouseExited(e -> boardSquare.blacken());
+                    }
+                });
+                field.setOnMouseExited(e -> boardSquare.blacken());
 
-                board.add(square, col, row);
+                board.add(field, col, row);
             }
         }
 
@@ -66,9 +84,8 @@ public class FoxAndHoundsGame extends Application {
         return board;
     }
 
-
-    private Piece makePiece(PieceType type, int row, int col, StackPane square) {
-        return new Piece(type, row, col, square);
+    private Piece makePiece(PieceType type, int row, int kol) {
+        return new Piece(type, row, kol);
     }
 
     public static void main(String[] args) {

@@ -1,9 +1,7 @@
-import javafx.beans.binding.Bindings;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-public class Piece extends StackPane {
+public class Piece extends Circle {
 
     private PieceType type;
     protected int row;
@@ -13,26 +11,18 @@ public class Piece extends StackPane {
         return type;
     }
 
-    public Piece(PieceType type, int row, int col, StackPane square) {
+    public Piece(PieceType type, int row, int col) {
         this.type = type;
         this.row = row;
         this.col = col;
-
-        Circle circle = new Circle();
-        circle.radiusProperty().bind(
-                Bindings.when(square.heightProperty().lessThan(square.widthProperty())).
-                        then(square.heightProperty()).otherwise(square.widthProperty()).subtract(10).divide(2)
-        );
-
-        circle.setFill(type == PieceType.FOX ? Color.BLACK : Color.PINK);
-        getChildren().addAll(circle);
+        setFill(type == PieceType.FOX ? Color.ORANGE : Color.BLACK);
     }
 
-    public int getRow() {
+    public int getRowPosition() {
         return row;
     }
 
-    public int getCol() {
+    public int getColPosition() {
         return col;
     }
 }

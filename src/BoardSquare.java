@@ -39,5 +39,12 @@ public class BoardSquare extends Region {
     public void setPiece(Piece piece) {
         this.piece = piece;
     }
+
+    public int showPossibility() {
+        if (piece.getType() == PieceType.FOX) {
+            return 0;
+        }
+        return 0;
+    }
 }
 
