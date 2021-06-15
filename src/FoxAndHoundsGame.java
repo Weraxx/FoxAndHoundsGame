@@ -1,6 +1,5 @@
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -8,13 +7,17 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.awt.*;
-
-
 public class FoxAndHoundsGame extends Application {
 
     public static final int COL_COUNT = 8;
     public static final int ROW_COUNT = 8;
+
+    public static final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
+    public static final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
+    public static final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
+    public static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
+    public static final Piece fox = new Piece(PieceType.FOX, 7, 0);
+    public static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -43,58 +46,75 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private GridPane getBoard() {
+        StackPane[][] stackPaneFields = new StackPane[8][8];
         BoardSquare[][] boardSquares = new BoardSquare[8][8];
         GridPane board = new GridPane();
-        for (int col = 0; col < COL_COUNT; ++col) {
-            for (int row = 0; row < ROW_COUNT; ++row) {
+        boolean[] czyPoprzednieKlikniecieNaPionku = {false};
+        final int[] oldRow = {0};
+        final int[] oldCol = {0};
+        Piece[] tmpPiece = {null};
+        for (int row = 0; row < COL_COUNT; ++row) {
+            for (int col = 0; col < ROW_COUNT; ++col) {
 
                 StackPane stackPaneField = new StackPane();
 
                 BoardSquare boardSquare;
                 if ((row + col) % 2 == 0) {
-                    boardSquare = new BoardSquare(Color.WHITESMOKE);
+                    boardSquare = new BoardSquare(Color.WHITESMOKE, row, col);
                 } else {
-                    boardSquare = new BoardSquare(Color.GRAY);
+                    boardSquare = new BoardSquare(Color.GRAY, row, col);
                 }
                 stackPaneField.getChildren().add(boardSquare);
                 boardSquares[row][col] = boardSquare;
+                stackPaneFields[row][col] = stackPaneField;
 
                 Piece piece = null;
-                if ((row < 1) && ((row + col) % 2 != 0)) {
-                    piece = makePiece(PieceType.HOUNDS, row, col);
+                if (row == hound_01.getRowPosition() && col == hound_01.getColPosition()) {
+                    piece = hound_01;
                 }
-                if ((row == 7) && (col == 0)) {
-                    piece = makePiece(PieceType.FOX, row, col);
+                if (row == hound_02.getRowPosition() && col == hound_02.getColPosition()) {
+                    piece = hound_02;
                 }
-                boardSquare.setPiece(piece);
+                if (row == hound_03.getRowPosition() && col == hound_03.getColPosition()) {
+                    piece = hound_03;
+                }
+                if (row == hound_04.getRowPosition() && col == hound_04.getColPosition()) {
+                    piece = hound_04;
+                }
+                if (row == fox.getRowPosition() && col == fox.getColPosition()) {
+                    piece = fox;
+                }
                 if (piece != null) {
                     piece.radiusProperty().bind(
                             Bindings.when(stackPaneField.heightProperty().lessThan(stackPaneField.widthProperty())).
                                     then(stackPaneField.heightProperty()).otherwise(stackPaneField.widthProperty()).subtract(10).divide(2)
                     );
                     stackPaneField.getChildren().add(piece);
+                    System.out.println(piece);
                 }
 
-                Piece finalPiece = piece;
-                int finalCol = col;
-                int finalRow = row;
-                stackPaneField.setOnMouseEntered(e -> {
-                    boardSquare.highlight();
-                    boardSquare.showPossibilities(boardSquare, boardSquares, finalPiece, finalRow, finalCol);
-                });
-                stackPaneField.setOnMouseExited(e -> {
-                    boardSquare.blacken();
-                    boardSquare.hidePossibilities(boardSquare, boardSquares, finalPiece, finalRow, finalCol);
-                });
+                stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
+                stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
+
                 stackPaneField.setOnMouseClicked(e ->
                 {
-                    if (boardSquare.hasPiece()) {
-                        //stackPaneField.getChildren().remove(1);
-                        //Piece movingPiece;
-                        //BoardSquare oldObject = boardSquares[boardSquare.getPiece().getRowPosition()][boardSquare.getPiece().getColPosition()];
-                        //movingPiece = oldObject.getPiece();
-                        //System.out.println(movingPiece.getRowPosition() + " " + movingPiece.getColPosition());
-                        //BoardSquare newObject = boardSquares[boardSquare.getPiece().getRowPosition()][boardSquare.getPiece().getColPosition()];
+                    if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0]) {
+                        czyPoprzednieKlikniecieNaPionku[0] = true;
+                        //tmpPiece[0] = (Piece) stackPaneField.getChildren().get(1);
+                        showPossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField),boardSquare.getBoardSquareRow(),boardSquare.getBoardSquareCol());
+                        tmpPiece[0] = zwrocObiektPiece(stackPaneField);
+                        oldRow[0] = tmpPiece[0] != null ? tmpPiece[0].getRowPosition() : 0;
+                        oldCol[0] = tmpPiece[0] != null ? tmpPiece[0].getColPosition() : 0;
+                    } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
+                        hidePossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField), oldRow[0], oldCol[0]);
+                        int newRow = boardSquare.getBoardSquareRow();
+                        int newCol = boardSquare.getBoardSquareCol();
+                        stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
+                        tmpPiece[0].setNewPosition(newRow,newCol);
+                        czyPoprzednieKlikniecieNaPionku[0] = false;
+                    } else if (czyPoprzednieKlikniecieNaPionku[0]) {
+                        hidePossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField), oldRow[0], oldCol[0]);
+                        czyPoprzednieKlikniecieNaPionku[0] = false;
                     }
                 });
                 board.add(stackPaneField, col, row);
@@ -116,8 +136,78 @@ public class FoxAndHoundsGame extends Application {
         return board;
     }
 
-    private Piece makePiece(PieceType type, int row, int kol) {
-        return new Piece(type, row, kol);
+    private boolean czyZawieraPiece(StackPane stackPane) {
+        for (Piece piece : pieces) {
+            if (stackPane.getChildren().contains(piece)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Piece zwrocObiektPiece(StackPane stackPane) {
+        for (Piece piece : pieces) {
+            if (stackPane.getChildren().contains(piece)) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
+        if (czyZawieraPiece(stackPaneField)) {
+            System.out.println(piece);
+            if (piece.getType() == PieceType.FOX) {
+                // PODSWIETLA MOZLIWE RUCHY DLA FOXA
+                if ((row + 1) < 8 && (col - 1) >= 0) {
+                    boardSquares[row + 1][col - 1].highlightPossibilities();
+                }
+                if ((row + 1) < 8 && (col + 1) < 8) {
+                    boardSquares[row + 1][col + 1].highlightPossibilities();
+                }
+                if ((row - 1) > 0 && (col - 1) >= 0) {
+                    boardSquares[row - 1][col - 1].highlightPossibilities();
+                }
+                if ((col + 1) < 8 && (row - 1) >= 0) {
+                    boardSquares[row - 1][col + 1].highlightPossibilities();
+                }
+            } else {
+                // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
+                if ((row + 1) < 8 && (col - 1) >= 0) {
+                    boardSquares[row + 1][col - 1].highlightPossibilities();
+                }
+                if ((row + 1) < 8 && (col + 1) < 8) {
+                    boardSquares[row + 1][col + 1].highlightPossibilities();
+                }
+            }
+        }
+    }
+
+    private void hidePossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
+        if (czyZawieraPiece(stackPaneField)) {
+            if (piece.getType() == PieceType.FOX) {
+                if ((row + 1) < 8 && (col - 1) >= 0) {
+                    boardSquares[row + 1][col - 1].blacken();
+                }
+                if ((row + 1) < 8 && (col + 1) < 8) {
+                    boardSquares[row + 1][col + 1].blacken();
+                }
+                if ((row - 1) > 0 && (col - 1) >= 0) {
+                    boardSquares[row - 1][col - 1].blacken();
+                }
+                if ((col + 1) < 8 && (row - 1) >= 0) {
+                    boardSquares[row - 1][col + 1].blacken();
+                }
+            } else {
+                // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
+                if ((row + 1) < 8 && (col - 1) >= 0) {
+                    boardSquares[row + 1][col - 1].blacken();
+                }
+                if ((row + 1) < 8 && (col + 1) < 8) {
+                    boardSquares[row + 1][col + 1].blacken();
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {

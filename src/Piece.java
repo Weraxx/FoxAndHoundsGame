@@ -25,4 +25,14 @@ public class Piece extends Circle {
     public int getColPosition() {
         return col;
     }
+
+    public void setNewPosition(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    @Override
+    public String toString() {
+        return (type + " " + row + " " + col);
+    }
 }
