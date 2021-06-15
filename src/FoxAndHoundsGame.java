@@ -1,9 +1,14 @@
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.awt.*;
 
 
 public class FoxAndHoundsGame extends Application {
@@ -13,11 +18,28 @@ public class FoxAndHoundsGame extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(getBoard(), 600, 600);
+        Scene scene = new Scene(getStartWindow(primaryStage), 600, 600);
 
-        primaryStage.setTitle("Board game");
+        primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private BorderPane getStartWindow(Stage primaryStage) {
+        BorderPane startWindow = new BorderPane();
+        Button startButton = new Button("START");
+        startWindow.setCenter(startButton);
+        Image image = new Image("Game-of-Fox-and-Hounds.jpg");
+        BackgroundImage backgroundImage = new BackgroundImage(image, null, null, null, null);
+        Background background = new Background(backgroundImage);
+        startWindow.setBackground(background);
+
+        startButton.setOnMouseClicked(e -> {
+            primaryStage.setScene(new Scene(getBoard(), 600, 600));
+            primaryStage.show();
+        });
+
+        return startWindow;
     }
 
     private GridPane getBoard() {
@@ -58,11 +80,22 @@ public class FoxAndHoundsGame extends Application {
                 int finalRow = row;
                 stackPaneField.setOnMouseEntered(e -> {
                     boardSquare.highlight();
-                    boardSquare.showPossibilities(boardSquare,boardSquares,finalPiece,finalRow,finalCol);
+                    boardSquare.showPossibilities(boardSquare, boardSquares, finalPiece, finalRow, finalCol);
                 });
                 stackPaneField.setOnMouseExited(e -> {
                     boardSquare.blacken();
-                    boardSquare.hidePossibilities(boardSquare,boardSquares,finalPiece,finalRow,finalCol);
+                    boardSquare.hidePossibilities(boardSquare, boardSquares, finalPiece, finalRow, finalCol);
+                });
+                stackPaneField.setOnMouseClicked(e ->
+                {
+                    if (boardSquare.hasPiece()) {
+                        //stackPaneField.getChildren().remove(1);
+                        //Piece movingPiece;
+                        //BoardSquare oldObject = boardSquares[boardSquare.getPiece().getRowPosition()][boardSquare.getPiece().getColPosition()];
+                        //movingPiece = oldObject.getPiece();
+                        //System.out.println(movingPiece.getRowPosition() + " " + movingPiece.getColPosition());
+                        //BoardSquare newObject = boardSquares[boardSquare.getPiece().getRowPosition()][boardSquare.getPiece().getColPosition()];
+                    }
                 });
                 board.add(stackPaneField, col, row);
             }
