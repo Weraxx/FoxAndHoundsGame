@@ -33,14 +33,14 @@ public class BoardSquare extends Region {
         setColor(color);
     }
 
-    private void setColor(Color color) {
+    public void setColor(Color color) {
         BackgroundFill fill = new BackgroundFill(color, null, new Insets(1));
         Background background = new Background(fill);
         setBackground(background);
     }
 
     public void highlightPossibilities() {
-        setColor(Color.LAVENDER);
+        setColor(Color.GREENYELLOW);
     }
 }
 

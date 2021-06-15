@@ -1,8 +1,10 @@
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -21,21 +23,23 @@ public class FoxAndHoundsGame extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(getStartWindow(primaryStage), 600, 600);
+        Scene scene = new Scene(getStartWindow(primaryStage), 800, 600);
 
         primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private BorderPane getStartWindow(Stage primaryStage) {
-        BorderPane startWindow = new BorderPane();
+    private StackPane getStartWindow(Stage primaryStage) {
+        StackPane startWindow = new StackPane();
         Button startButton = new Button("START");
-        startWindow.setCenter(startButton);
+        startButton.setPrefSize(150, 50);
+        startWindow.setAlignment(Pos.CENTER);
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
-        BackgroundImage backgroundImage = new BackgroundImage(image, null, null, null, null);
-        Background background = new Background(backgroundImage);
-        startWindow.setBackground(background);
+        ImageView imageView = new ImageView(image);
+        imageView.fitHeightProperty().bind(startWindow.heightProperty());
+        imageView.fitWidthProperty().bind(startWindow.widthProperty());
+        startWindow.getChildren().addAll(imageView, startButton);
 
         startButton.setOnMouseClicked(e -> {
             primaryStage.setScene(new Scene(getBoard(), 600, 600));
@@ -45,13 +49,11 @@ public class FoxAndHoundsGame extends Application {
         return startWindow;
     }
 
+    StackPane[][] stackPaneFields = new StackPane[8][8];
+    BoardSquare[][] boardSquares = new BoardSquare[8][8];
     private GridPane getBoard() {
-        StackPane[][] stackPaneFields = new StackPane[8][8];
-        BoardSquare[][] boardSquares = new BoardSquare[8][8];
         GridPane board = new GridPane();
         boolean[] czyPoprzednieKlikniecieNaPionku = {false};
-        final int[] oldRow = {0};
-        final int[] oldCol = {0};
         Piece[] tmpPiece = {null};
         for (int row = 0; row < COL_COUNT; ++row) {
             for (int col = 0; col < ROW_COUNT; ++col) {
@@ -90,30 +92,23 @@ public class FoxAndHoundsGame extends Application {
                                     then(stackPaneField.heightProperty()).otherwise(stackPaneField.widthProperty()).subtract(10).divide(2)
                     );
                     stackPaneField.getChildren().add(piece);
-                    System.out.println(piece);
                 }
 
                 stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
-
-                stackPaneField.setOnMouseClicked(e ->
-                {
+                stackPaneField.setOnMouseClicked(e -> {
                     if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0]) {
                         czyPoprzednieKlikniecieNaPionku[0] = true;
-                        //tmpPiece[0] = (Piece) stackPaneField.getChildren().get(1);
-                        showPossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField),boardSquare.getBoardSquareRow(),boardSquare.getBoardSquareCol());
+                        showPossibilities(boardSquares, stackPaneField, zwrocObiektPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
                         tmpPiece[0] = zwrocObiektPiece(stackPaneField);
-                        oldRow[0] = tmpPiece[0] != null ? tmpPiece[0].getRowPosition() : 0;
-                        oldCol[0] = tmpPiece[0] != null ? tmpPiece[0].getColPosition() : 0;
                     } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
-                        hidePossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField), oldRow[0], oldCol[0]);
+                        hidePossibilities(boardSquares);
                         int newRow = boardSquare.getBoardSquareRow();
                         int newCol = boardSquare.getBoardSquareCol();
                         stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
-                        tmpPiece[0].setNewPosition(newRow,newCol);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
                     } else if (czyPoprzednieKlikniecieNaPionku[0]) {
-                        hidePossibilities(boardSquares,stackPaneField,zwrocObiektPiece(stackPaneField), oldRow[0], oldCol[0]);
+                        hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
                     }
                 });
@@ -156,55 +151,51 @@ public class FoxAndHoundsGame extends Application {
 
     private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
         if (czyZawieraPiece(stackPaneField)) {
-            System.out.println(piece);
             if (piece.getType() == PieceType.FOX) {
                 // PODSWIETLA MOZLIWE RUCHY DLA FOXA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
-                    boardSquares[row + 1][col - 1].highlightPossibilities();
+                    if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                        boardSquares[row + 1][col - 1].highlightPossibilities();
+                    }
                 }
                 if ((row + 1) < 8 && (col + 1) < 8) {
-                    boardSquares[row + 1][col + 1].highlightPossibilities();
+                    if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                        boardSquares[row + 1][col + 1].highlightPossibilities();
+                    }
                 }
-                if ((row - 1) > 0 && (col - 1) >= 0) {
-                    boardSquares[row - 1][col - 1].highlightPossibilities();
+                if ((row - 1) >= 0 && (col - 1) >= 0) {
+                    if (!czyZawieraPiece(stackPaneFields[row - 1][col - 1])) {
+                        boardSquares[row - 1][col - 1].highlightPossibilities();
+                    }
                 }
                 if ((col + 1) < 8 && (row - 1) >= 0) {
-                    boardSquares[row - 1][col + 1].highlightPossibilities();
+                    if (!czyZawieraPiece(stackPaneFields[row - 1][col + 1])) {
+                        boardSquares[row - 1][col + 1].highlightPossibilities();
+                    }
                 }
             } else {
                 // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
-                    boardSquares[row + 1][col - 1].highlightPossibilities();
+                    if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                        boardSquares[row + 1][col - 1].highlightPossibilities();
+                    }
                 }
                 if ((row + 1) < 8 && (col + 1) < 8) {
-                    boardSquares[row + 1][col + 1].highlightPossibilities();
+                    if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                        boardSquares[row + 1][col + 1].highlightPossibilities();
+                    }
                 }
             }
         }
     }
 
-    private void hidePossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
-        if (czyZawieraPiece(stackPaneField)) {
-            if (piece.getType() == PieceType.FOX) {
-                if ((row + 1) < 8 && (col - 1) >= 0) {
-                    boardSquares[row + 1][col - 1].blacken();
-                }
-                if ((row + 1) < 8 && (col + 1) < 8) {
-                    boardSquares[row + 1][col + 1].blacken();
-                }
-                if ((row - 1) > 0 && (col - 1) >= 0) {
-                    boardSquares[row - 1][col - 1].blacken();
-                }
-                if ((col + 1) < 8 && (row - 1) >= 0) {
-                    boardSquares[row - 1][col + 1].blacken();
-                }
-            } else {
-                // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
-                if ((row + 1) < 8 && (col - 1) >= 0) {
-                    boardSquares[row + 1][col - 1].blacken();
-                }
-                if ((row + 1) < 8 && (col + 1) < 8) {
-                    boardSquares[row + 1][col + 1].blacken();
+    private void hidePossibilities(BoardSquare[][] boardSquares) {
+        for (int row = 0; row < COL_COUNT; ++row) {
+            for (int col = 0; col < ROW_COUNT; ++col) {
+                if ((row + col) % 2 == 0) {
+                    boardSquares[row][col].setColor(Color.WHITESMOKE);
+                } else {
+                    boardSquares[row][col].setColor(Color.GRAY);
                 }
             }
         }
