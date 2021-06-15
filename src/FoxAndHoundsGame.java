@@ -21,11 +21,12 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private GridPane getBoard() {
+        BoardSquare[][] boardSquares = new BoardSquare[8][8];
         GridPane board = new GridPane();
         for (int col = 0; col < COL_COUNT; ++col) {
             for (int row = 0; row < ROW_COUNT; ++row) {
 
-                StackPane field = new StackPane();
+                StackPane stackPaneField = new StackPane();
 
                 BoardSquare boardSquare;
                 if ((row + col) % 2 == 0) {
@@ -33,7 +34,8 @@ public class FoxAndHoundsGame extends Application {
                 } else {
                     boardSquare = new BoardSquare(Color.GRAY);
                 }
-                field.getChildren().add(boardSquare);
+                stackPaneField.getChildren().add(boardSquare);
+                boardSquares[row][col] = boardSquare;
 
                 Piece piece = null;
                 if ((row < 1) && ((row + col) % 2 != 0)) {
@@ -45,27 +47,24 @@ public class FoxAndHoundsGame extends Application {
                 boardSquare.setPiece(piece);
                 if (piece != null) {
                     piece.radiusProperty().bind(
-                            Bindings.when(field.heightProperty().lessThan(field.widthProperty())).
-                                    then(field.heightProperty()).otherwise(field.widthProperty()).subtract(10).divide(2)
+                            Bindings.when(stackPaneField.heightProperty().lessThan(stackPaneField.widthProperty())).
+                                    then(stackPaneField.heightProperty()).otherwise(stackPaneField.widthProperty()).subtract(10).divide(2)
                     );
-                    field.getChildren().add(piece);
+                    stackPaneField.getChildren().add(piece);
                 }
 
                 Piece finalPiece = piece;
-                field.setOnMouseEntered(e -> {
+                int finalCol = col;
+                int finalRow = row;
+                stackPaneField.setOnMouseEntered(e -> {
                     boardSquare.highlight();
-                    if (boardSquare.hasPiece()) {
-                        if (finalPiece.getType() == PieceType.FOX) {
-                            // PODSWIETLA MOZLIWE RUCHY DLA FOXA
-                        } else {
-                            // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
-                        }
-
-                    }
+                    boardSquare.showPossibilities(boardSquare,boardSquares,finalPiece,finalRow,finalCol);
                 });
-                field.setOnMouseExited(e -> boardSquare.blacken());
-
-                board.add(field, col, row);
+                stackPaneField.setOnMouseExited(e -> {
+                    boardSquare.blacken();
+                    boardSquare.hidePossibilities(boardSquare,boardSquares,finalPiece,finalRow,finalCol);
+                });
+                board.add(stackPaneField, col, row);
             }
         }
 
