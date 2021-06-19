@@ -12,16 +12,16 @@ import javafx.stage.Stage;
 
 public class FoxAndHoundsGame extends Application {
 
-    public static final int COL_COUNT = 8;
-    public static final int ROW_COUNT = 8;
+    private static final int COL_COUNT = 8;
+    private static final int ROW_COUNT = 8;
 
-    public static final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
-    public static final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
-    public static final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
-    public static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
-    public static final Piece fox = new Piece(PieceType.FOX, 7, 0);
-    public static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
-    public static final Piece[] lastMove = {hound_01};
+    private static final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
+    private static final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
+    private static final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
+    private static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
+    private static final Piece fox = new Piece(PieceType.FOX, 7, 0);
+    private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
+    private static final Piece[] lastMove = {hound_01};
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -110,17 +110,17 @@ public class FoxAndHoundsGame extends Application {
                 });
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
                 stackPaneField.setOnMouseClicked(e -> {
-                    if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0] && lastMove[0].getType() != zwrocObiektPiece(stackPaneField).getType()) {
+                    if (ifContainPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
                         czyPoprzednieKlikniecieNaPionku[0] = true;
-                        showPossibilities(boardSquares, stackPaneField, zwrocObiektPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
-                        tmpPiece[0] = zwrocObiektPiece(stackPaneField);
-                    } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
+                        showPossibilities(boardSquares, stackPaneField, deliverObjectPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
+                        tmpPiece[0] = deliverObjectPiece(stackPaneField);
+                    } else if (!ifContainPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
                         int newRow = boardSquare.getBoardSquareRow();
                         int newCol = boardSquare.getBoardSquareCol();
                         if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
                             stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
                             tmpPiece[0].setNewPosition(newRow, newCol);
-                            lastMove[0] = zwrocObiektPiece(stackPaneField);
+                            lastMove[0] = deliverObjectPiece(stackPaneField);
                         }
                         hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
@@ -155,7 +155,7 @@ public class FoxAndHoundsGame extends Application {
         return board;
     }
 
-    private boolean czyZawieraPiece(StackPane stackPane) {
+    private boolean ifContainPiece(StackPane stackPane) {
         for (Piece piece : pieces) {
             if (stackPane.getChildren().contains(piece)) {
                 return true;
@@ -164,7 +164,7 @@ public class FoxAndHoundsGame extends Application {
         return false;
     }
 
-    private Piece zwrocObiektPiece(StackPane stackPane) {
+    private Piece deliverObjectPiece(StackPane stackPane) {
         for (Piece piece : pieces) {
             if (stackPane.getChildren().contains(piece)) {
                 return piece;
@@ -174,38 +174,38 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
-        if (czyZawieraPiece(stackPaneField)) {
+        if (ifContainPiece(stackPaneField)) {
             if (piece.getType() == PieceType.FOX) {
                 // PODSWIETLA MOZLIWE RUCHY DLA FOXA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
-                    if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                    if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
                     }
                 }
                 if ((row + 1) < 8 && (col + 1) < 8) {
-                    if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                    if (!ifContainPiece(stackPaneFields[row + 1][col + 1])) {
                         boardSquares[row + 1][col + 1].highlightPossibilities();
                     }
                 }
                 if ((row - 1) >= 0 && (col - 1) >= 0) {
-                    if (!czyZawieraPiece(stackPaneFields[row - 1][col - 1])) {
+                    if (!ifContainPiece(stackPaneFields[row - 1][col - 1])) {
                         boardSquares[row - 1][col - 1].highlightPossibilities();
                     }
                 }
                 if ((col + 1) < 8 && (row - 1) >= 0) {
-                    if (!czyZawieraPiece(stackPaneFields[row - 1][col + 1])) {
+                    if (!ifContainPiece(stackPaneFields[row - 1][col + 1])) {
                         boardSquares[row - 1][col + 1].highlightPossibilities();
                     }
                 }
             } else {
                 // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
-                    if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                    if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
                     }
                 }
                 if ((row + 1) < 8 && (col + 1) < 8) {
-                    if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                    if (!ifContainPiece(stackPaneFields[row + 1][col + 1])) {
                         boardSquares[row + 1][col + 1].highlightPossibilities();
                     }
                 }
@@ -228,22 +228,22 @@ public class FoxAndHoundsGame extends Application {
     private boolean isMovementPossibleFox(Piece piece, int row, int col, int newRow, int newCol) {
         if (piece.getType() == PieceType.FOX) {
             if ((row + 1) == newRow && (col - 1) == newCol) {
-                if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                     return true;
                 }
             }
             if ((row + 1) == newRow && (col + 1) == newCol) {
-                if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                if (!ifContainPiece(stackPaneFields[row + 1][col + 1])) {
                     return true;
                 }
             }
             if ((row - 1) == newRow && (col - 1) == newCol) {
-                if (!czyZawieraPiece(stackPaneFields[row - 1][col - 1])) {
+                if (!ifContainPiece(stackPaneFields[row - 1][col - 1])) {
                     return true;
                 }
             }
             if ((col + 1) == newCol && (row - 1) == newRow) {
-                return !czyZawieraPiece(stackPaneFields[row - 1][col + 1]);
+                return !ifContainPiece(stackPaneFields[row - 1][col + 1]);
             }
         }
         return false;
@@ -252,12 +252,12 @@ public class FoxAndHoundsGame extends Application {
     private boolean isMovementPossibleHounds(Piece piece, int row, int col, int newRow, int newCol) {
         if (piece.getType() == PieceType.HOUNDS) {
             if ((row + 1) == newRow && (col - 1) == newCol) {
-                if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                     return true;
                 }
             }
             if ((row + 1) == newRow && (col + 1) == newCol) {
-                return !czyZawieraPiece(stackPaneFields[row + 1][col + 1]);
+                return !ifContainPiece(stackPaneFields[row + 1][col + 1]);
             }
         }
         return false;
