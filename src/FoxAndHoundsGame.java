@@ -1,4 +1,3 @@
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -10,7 +9,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class FoxAndHoundsGame extends Application {
 
@@ -104,6 +102,9 @@ public class FoxAndHoundsGame extends Application {
                     boardSquare.highlight();
                     if (areHoundsWinner()) {
                         System.out.println("HOUNDS ARE THE WINNER");
+                    }
+                    if (isTheFoxWinner()) {
+                        System.out.println("FOX IS THE WINNER");
                     }
                 });
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
@@ -255,8 +256,26 @@ public class FoxAndHoundsGame extends Application {
         return false;
     }
 
-    private boolean isTheFoxWinner(Piece piece) {
-        return true;
+    private boolean isTheFoxWinner() {
+        Piece piece = null;
+        loop:
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (stackPaneFields[row][col].getChildren().contains(pieces[4])) {
+                    piece = pieces[4];
+                    break loop;
+                }
+                piece = null;
+            }
+        }
+
+        boolean isTheFoxWinner = false;
+        if (piece != null && piece.getType() == PieceType.FOX) {
+            if (piece.getRowPosition() == 0) {
+                    isTheFoxWinner = true;
+            }
+        }
+        return isTheFoxWinner;
     }
 
     private boolean areHoundsWinner() {
@@ -271,7 +290,6 @@ public class FoxAndHoundsGame extends Application {
                 piece = null;
             }
         }
-
 
         boolean areHoundsWinner = true;
         loop_2:
