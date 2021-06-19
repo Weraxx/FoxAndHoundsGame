@@ -1,3 +1,5 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -8,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class FoxAndHoundsGame extends Application {
 
@@ -53,6 +56,8 @@ public class FoxAndHoundsGame extends Application {
     BoardSquare[][] boardSquares = new BoardSquare[8][8];
 
     private GridPane getBoard() {
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
         GridPane board = new GridPane();
         boolean[] czyPoprzednieKlikniecieNaPionku = {false};
         Piece[] tmpPiece = {null};
@@ -95,7 +100,12 @@ public class FoxAndHoundsGame extends Application {
                     stackPaneField.getChildren().add(piece);
                 }
 
-                stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
+                stackPaneField.setOnMouseEntered(e -> {
+                    boardSquare.highlight();
+                    if (areHoundsWinner()) {
+                        System.out.println("HOUNDS ARE THE WINNER");
+                    }
+                });
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
                 stackPaneField.setOnMouseClicked(e -> {
                     if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0]) {
@@ -243,6 +253,41 @@ public class FoxAndHoundsGame extends Application {
             }
         }
         return false;
+    }
+
+    private boolean isTheFoxWinner(Piece piece) {
+        return true;
+    }
+
+    private boolean areHoundsWinner() {
+        Piece piece = null;
+        loop_2:
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (stackPaneFields[row][col].getChildren().contains(pieces[4])) {
+                    piece = pieces[4];
+                    break loop_2;
+                }
+                piece = null;
+            }
+        }
+
+
+        boolean areHoundsWinner = true;
+        loop_2:
+        if (piece != null && piece.getType() == PieceType.FOX) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (isMovementPossibleFox(piece, piece.getRowPosition(), piece.getColPosition(), i, j)) {
+                        areHoundsWinner = false;
+                        break loop_2;
+                    }
+                }
+            }
+        } else {
+            areHoundsWinner = false;
+        }
+        return areHoundsWinner;
     }
 
     public static void main(String[] args) {
