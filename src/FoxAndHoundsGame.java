@@ -102,7 +102,7 @@ public class FoxAndHoundsGame extends Application {
                 stackPaneField.setOnMouseEntered(e -> {
                     boardSquare.highlight();
                     if (areHoundsWinner()) {
-                        System.out.println("HOUNDS ARE THE WINNER");
+                        System.out.println("HOUNDS ARE THE WINNER"); // TODO zrobic okienka dialaogowe, wstawic funkcje spr zwyciezczy w timer
                     }
                     if (isTheFoxWinner()) {
                         System.out.println("FOX IS THE WINNER");
@@ -111,27 +111,26 @@ public class FoxAndHoundsGame extends Application {
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
                 stackPaneField.setOnMouseClicked(e -> {
                     if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0] && lastMove[0].getType() != zwrocObiektPiece(stackPaneField).getType()) {
-                        // klikniecie w pionek i czy poprzednie nie bylo na pionku
                         czyPoprzednieKlikniecieNaPionku[0] = true;
                         showPossibilities(boardSquares, stackPaneField, zwrocObiektPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
                         tmpPiece[0] = zwrocObiektPiece(stackPaneField);
-                        lastMove[0] = zwrocObiektPiece(stackPaneField);
                     } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
-                        // nie zawiera pionka - klikniecie w pole, a poprzednie klikniecie na pionku
                         int newRow = boardSquare.getBoardSquareRow();
                         int newCol = boardSquare.getBoardSquareCol();
                         if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
                             stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
                             tmpPiece[0].setNewPosition(newRow, newCol);
+                            lastMove[0] = zwrocObiektPiece(stackPaneField);
                         }
                         hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
                     } else if (czyPoprzednieKlikniecieNaPionku[0]) {
+                        // KLIKNIECIE DRUGI RAZ NA PIONKU
                         hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
                     } else {
                         if (lastMove[0].getType() == PieceType.FOX){
-                            System.out.println("RUCH PSA");
+                            System.out.println("RUCH PSA"); // TODO zrobic okienka dialaogowe
                         } else {
                             System.out.println("RUCH LISA");
                         }
