@@ -51,6 +51,7 @@ public class FoxAndHoundsGame extends Application {
 
     StackPane[][] stackPaneFields = new StackPane[8][8];
     BoardSquare[][] boardSquares = new BoardSquare[8][8];
+
     private GridPane getBoard() {
         GridPane board = new GridPane();
         boolean[] czyPoprzednieKlikniecieNaPionku = {false};
@@ -98,14 +99,19 @@ public class FoxAndHoundsGame extends Application {
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
                 stackPaneField.setOnMouseClicked(e -> {
                     if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0]) {
+                        // klikniecie w pionek i czy poprzednie nie bylo na pionku
                         czyPoprzednieKlikniecieNaPionku[0] = true;
                         showPossibilities(boardSquares, stackPaneField, zwrocObiektPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
                         tmpPiece[0] = zwrocObiektPiece(stackPaneField);
                     } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
-                        hidePossibilities(boardSquares);
+                        // nie zawiera pionka - klikniecie w pole, a poprzednie klikniecie na pionku
                         int newRow = boardSquare.getBoardSquareRow();
                         int newCol = boardSquare.getBoardSquareCol();
-                        stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
+                        if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
+                            stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
+                            tmpPiece[0].setNewPosition(newRow, newCol);
+                        }
+                        hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
                     } else if (czyPoprzednieKlikniecieNaPionku[0]) {
                         hidePossibilities(boardSquares);
@@ -199,6 +205,44 @@ public class FoxAndHoundsGame extends Application {
                 }
             }
         }
+    }
+
+    private boolean isMovementPossibleFox(Piece piece, int row, int col, int newRow, int newCol) {
+        if (piece.getType() == PieceType.FOX) {
+            if ((row + 1) == newRow && (col - 1) == newCol) {
+                if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                    return true;
+                }
+            }
+            if ((row + 1) == newRow && (col + 1) == newCol) {
+                if (!czyZawieraPiece(stackPaneFields[row + 1][col + 1])) {
+                    return true;
+                }
+            }
+            if ((row - 1) == newRow && (col - 1) == newCol) {
+                if (!czyZawieraPiece(stackPaneFields[row - 1][col - 1])) {
+                    return true;
+                }
+            }
+            if ((col + 1) == newCol && (row - 1) == newRow) {
+                return !czyZawieraPiece(stackPaneFields[row - 1][col + 1]);
+            }
+        }
+        return false;
+    }
+
+    private boolean isMovementPossibleHounds(Piece piece, int row, int col, int newRow, int newCol) {
+        if (piece.getType() == PieceType.HOUNDS) {
+            if ((row + 1) == newRow && (col - 1) == newCol) {
+                if (!czyZawieraPiece(stackPaneFields[row + 1][col - 1])) {
+                    return true;
+                }
+            }
+            if ((row + 1) == newRow && (col + 1) == newCol) {
+                return !czyZawieraPiece(stackPaneFields[row + 1][col + 1]);
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
