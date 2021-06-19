@@ -21,6 +21,7 @@ public class FoxAndHoundsGame extends Application {
     public static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
     public static final Piece fox = new Piece(PieceType.FOX, 7, 0);
     public static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
+    public static final Piece[] lastMove = {hound_01};
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -109,11 +110,12 @@ public class FoxAndHoundsGame extends Application {
                 });
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
                 stackPaneField.setOnMouseClicked(e -> {
-                    if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0]) {
+                    if (czyZawieraPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0] && lastMove[0].getType() != zwrocObiektPiece(stackPaneField).getType()) {
                         // klikniecie w pionek i czy poprzednie nie bylo na pionku
                         czyPoprzednieKlikniecieNaPionku[0] = true;
                         showPossibilities(boardSquares, stackPaneField, zwrocObiektPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
                         tmpPiece[0] = zwrocObiektPiece(stackPaneField);
+                        lastMove[0] = zwrocObiektPiece(stackPaneField);
                     } else if (!czyZawieraPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
                         // nie zawiera pionka - klikniecie w pole, a poprzednie klikniecie na pionku
                         int newRow = boardSquare.getBoardSquareRow();
@@ -127,6 +129,12 @@ public class FoxAndHoundsGame extends Application {
                     } else if (czyPoprzednieKlikniecieNaPionku[0]) {
                         hidePossibilities(boardSquares);
                         czyPoprzednieKlikniecieNaPionku[0] = false;
+                    } else {
+                        if (lastMove[0].getType() == PieceType.FOX){
+                            System.out.println("RUCH PSA");
+                        } else {
+                            System.out.println("RUCH LISA");
+                        }
                     }
                 });
                 board.add(stackPaneField, col, row);
@@ -258,12 +266,12 @@ public class FoxAndHoundsGame extends Application {
 
     private boolean isTheFoxWinner() {
         Piece piece = null;
-        loop:
+        loop_2:
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 if (stackPaneFields[row][col].getChildren().contains(pieces[4])) {
                     piece = pieces[4];
-                    break loop;
+                    break loop_2;
                 }
                 piece = null;
             }
