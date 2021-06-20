@@ -1,14 +1,16 @@
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class FoxAndHoundsGame extends Application {
 
@@ -54,12 +56,20 @@ public class FoxAndHoundsGame extends Application {
     StackPane[][] stackPaneFields = new StackPane[8][8];
     BoardSquare[][] boardSquares = new BoardSquare[8][8];
 
-    private GridPane getBoard() {
-        Timeline timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
+    private VBox getBoard() {
+        MenuBar menuBar = new MenuBar();
+        Menu menu = new Menu("Options");
+        menuBar.getMenus().add(menu);
+        MenuItem menuItemSave = new MenuItem("save");
+        menu.getItems().add(menuItemSave);
+
+        VBox boardWithMenuBar = new VBox(menuBar);
+
         GridPane board = new GridPane();
-        boolean[] czyPoprzednieKlikniecieNaPionku = {false};
+
+        boolean[] ifLastClickOnPiece = {false};
         Piece[] tmpPiece = {null};
+
         for (int row = 0; row < COL_COUNT; ++row) {
             for (int col = 0; col < ROW_COUNT; ++col) {
 
@@ -99,22 +109,17 @@ public class FoxAndHoundsGame extends Application {
                     stackPaneField.getChildren().add(piece);
                 }
 
-                stackPaneField.setOnMouseEntered(e -> {
-                    boardSquare.highlight();
-                    if (areHoundsWinner()) {
-                        System.out.println("HOUNDS ARE THE WINNER"); // TODO zrobic okienka dialaogowe, wstawic funkcje spr zwyciezczy w timer
-                    }
-                    if (isTheFoxWinner()) {
-                        System.out.println("FOX IS THE WINNER");
-                    }
-                });
+
+                stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
+                Alert movementWarning = new Alert(Alert.AlertType.WARNING);
+                movementWarning.setHeaderText(null);
                 stackPaneField.setOnMouseClicked(e -> {
-                    if (ifContainPiece(stackPaneField) && !czyPoprzednieKlikniecieNaPionku[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
-                        czyPoprzednieKlikniecieNaPionku[0] = true;
+                    if (ifContainPiece(stackPaneField) && !ifLastClickOnPiece[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
+                        ifLastClickOnPiece[0] = true;
                         showPossibilities(boardSquares, stackPaneField, deliverObjectPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
                         tmpPiece[0] = deliverObjectPiece(stackPaneField);
-                    } else if (!ifContainPiece(stackPaneField) && czyPoprzednieKlikniecieNaPionku[0]) {
+                    } else if (!ifContainPiece(stackPaneField) && ifLastClickOnPiece[0]) {
                         int newRow = boardSquare.getBoardSquareRow();
                         int newCol = boardSquare.getBoardSquareCol();
                         if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
@@ -123,22 +128,42 @@ public class FoxAndHoundsGame extends Application {
                             lastMove[0] = deliverObjectPiece(stackPaneField);
                         }
                         hidePossibilities(boardSquares);
-                        czyPoprzednieKlikniecieNaPionku[0] = false;
-                    } else if (czyPoprzednieKlikniecieNaPionku[0]) {
-                        // KLIKNIECIE DRUGI RAZ NA PIONKU
+                        ifLastClickOnPiece[0] = false;
+                    } else if (ifLastClickOnPiece[0]) {
                         hidePossibilities(boardSquares);
-                        czyPoprzednieKlikniecieNaPionku[0] = false;
+                        ifLastClickOnPiece[0] = false;
                     } else {
-                        if (lastMove[0].getType() == PieceType.FOX){
-                            System.out.println("RUCH PSA"); // TODO zrobic okienka dialaogowe
+                        if (lastMove[0].getType() == PieceType.FOX) {
+                            movementWarning.setContentText("HOUNDS TURN");
                         } else {
-                            System.out.println("RUCH LISA");
+                            movementWarning.setContentText("FOX'S TURN");
                         }
+                        movementWarning.showAndWait();
                     }
                 });
                 board.add(stackPaneField, col, row);
             }
         }
+
+        Alert alertWinnerOfTheGame = new Alert(Alert.AlertType.INFORMATION);
+        alertWinnerOfTheGame.setTitle("WINNER");
+        alertWinnerOfTheGame.setHeaderText(null);
+        Timeline timeline = new Timeline();
+        KeyFrame keyFrame = new KeyFrame(Duration.millis(1), e -> {
+            if (areHoundsWinner()) {
+                timeline.stop();
+                alertWinnerOfTheGame.setContentText("HOUNDS ARE THE WINNER");
+                alertWinnerOfTheGame.show();
+            }
+            if (isTheFoxWinner()) {
+                timeline.stop();
+                alertWinnerOfTheGame.setContentText("FOX IS THE WINNER");
+                alertWinnerOfTheGame.show();
+            }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
 
         for (int col = 0; col < COL_COUNT; ++col) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
@@ -152,7 +177,9 @@ public class FoxAndHoundsGame extends Application {
             board.getRowConstraints().add(rowConstraints);
         }
 
-        return board;
+        board.setPrefSize(600, 600);
+        boardWithMenuBar.getChildren().add(board);
+        return boardWithMenuBar;
     }
 
     private boolean ifContainPiece(StackPane stackPane) {
@@ -176,7 +203,6 @@ public class FoxAndHoundsGame extends Application {
     private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
         if (ifContainPiece(stackPaneField)) {
             if (piece.getType() == PieceType.FOX) {
-                // PODSWIETLA MOZLIWE RUCHY DLA FOXA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
@@ -198,7 +224,6 @@ public class FoxAndHoundsGame extends Application {
                     }
                 }
             } else {
-                // PODSWIETLA MOZLIWE RUCHY DLA HOUNDA
                 if ((row + 1) < 8 && (col - 1) >= 0) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
@@ -279,7 +304,7 @@ public class FoxAndHoundsGame extends Application {
         boolean isTheFoxWinner = false;
         if (piece != null && piece.getType() == PieceType.FOX) {
             if (piece.getRowPosition() == 0) {
-                    isTheFoxWinner = true;
+                isTheFoxWinner = true;
             }
         }
         return isTheFoxWinner;
