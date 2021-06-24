@@ -9,8 +9,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 public class FoxAndHoundsGame extends Application {
 
@@ -24,6 +30,7 @@ public class FoxAndHoundsGame extends Application {
     private static final Piece fox = new Piece(PieceType.FOX, 7, 0);
     private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
     private static final Piece[] lastMove = {hound_01};
+    private static final Piece[] hounds = {hound_01, hound_02, hound_03, hound_04};
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -61,7 +68,8 @@ public class FoxAndHoundsGame extends Application {
         Menu menu = new Menu("Options");
         menuBar.getMenus().add(menu);
         MenuItem menuItemSave = new MenuItem("save");
-        menu.getItems().add(menuItemSave);
+        MenuItem menuItemOpen = new MenuItem("open");
+        menu.getItems().addAll(menuItemSave, menuItemOpen);
 
         VBox boardWithMenuBar = new VBox(menuBar);
 
@@ -165,6 +173,21 @@ public class FoxAndHoundsGame extends Application {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
 
+        FileChooser fileChooser = new FileChooser();
+        menuItemSave.setOnAction(actionEvent -> {
+            File file = fileChooser.showSaveDialog(null);
+            if (file != null) {
+                save(file, stackPaneFields);
+            }
+        });
+
+        menuItemOpen.setOnAction(actionEvent -> {
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+                open(file, stackPaneFields);
+            }
+        });
+
         for (int col = 0; col < COL_COUNT; ++col) {
             ColumnConstraints columnConstraints = new ColumnConstraints();
             columnConstraints.setPercentWidth(100);
@@ -180,6 +203,66 @@ public class FoxAndHoundsGame extends Application {
         board.setPrefSize(600, 600);
         boardWithMenuBar.getChildren().add(board);
         return boardWithMenuBar;
+    }
+
+    private void save(File file, StackPane[][] stackPaneFields) {
+        PrintWriter printWriter;
+        try {
+            printWriter = new PrintWriter(file.getAbsolutePath());
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    if (ifContainPiece(stackPaneFields[row][col])) {
+                        printWriter.print(deliverObjectPiece(stackPaneFields[row][col]));
+                        printWriter.print("\r\n");
+                    }
+                }
+            }
+            printWriter.print("last " + lastMove[0]);
+            printWriter.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void open(File file, StackPane[][] stackPaneFields) {
+        deletePieces(stackPaneFields);
+        Scanner lineScanner = null;
+        try {
+            lineScanner = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        int tmpRow;
+        int tmpCol;
+        String tmpType;
+        String tmpLine;
+        String[] tmpData;
+        int houndCount = 0;
+        while (lineScanner.hasNextLine()) {
+            tmpLine = lineScanner.nextLine();
+            tmpData = tmpLine.split(" ");
+            tmpType = tmpData[0];
+            if (tmpType.equals("last")) {
+                if (tmpData[1].equals("FOX")) {
+                    lastMove[0] = fox;
+                } else {
+                    lastMove[0] = hounds[0];
+                }
+            } else {
+                tmpRow = Integer.parseInt(tmpData[1]);
+                tmpCol = Integer.parseInt(tmpData[2]);
+                if (tmpType.equals("FOX")) {
+                    fox.setNewPosition(tmpRow, tmpCol);
+                    stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                } else {
+                    hounds[houndCount].setNewPosition(tmpRow, tmpCol);
+                    stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
+                    houndCount++;
+                }
+            }
+
+        }
     }
 
     private boolean ifContainPiece(StackPane stackPane) {
@@ -198,6 +281,16 @@ public class FoxAndHoundsGame extends Application {
             }
         }
         return null;
+    }
+
+    private void deletePieces(StackPane[][] stackPaneFields) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                if (ifContainPiece(stackPaneFields[row][col])) {
+                    stackPaneFields[row][col].getChildren().remove(1);
+                }
+            }
+        }
     }
 
     private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
