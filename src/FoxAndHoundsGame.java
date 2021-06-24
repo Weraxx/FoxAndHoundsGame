@@ -174,6 +174,7 @@ public class FoxAndHoundsGame extends Application {
         timeline.play();
 
         FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
         menuItemSave.setOnAction(actionEvent -> {
             File file = fileChooser.showSaveDialog(null);
             if (file != null) {
@@ -181,10 +182,16 @@ public class FoxAndHoundsGame extends Application {
             }
         });
 
+        Alert alertWrongExtension = new Alert(Alert.AlertType.WARNING);
+        alertWrongExtension.setHeaderText(null);
+        alertWrongExtension.setContentText("Wrong file extension");
         menuItemOpen.setOnAction(actionEvent -> {
             File file = fileChooser.showOpenDialog(null);
-            if (file != null) {
+            if (file != null && file.getAbsolutePath().endsWith(".txt")) {
                 open(file, stackPaneFields);
+            }
+            else{
+                alertWrongExtension.showAndWait();
             }
         });
 
