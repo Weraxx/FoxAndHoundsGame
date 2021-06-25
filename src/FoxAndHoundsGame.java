@@ -93,30 +93,7 @@ public class FoxAndHoundsGame extends Application {
                 boardSquares[row][col] = boardSquare;
                 stackPaneFields[row][col] = stackPaneField;
 
-                Piece piece = null;
-                if (row == hound_01.getRowPosition() && col == hound_01.getColPosition()) {
-                    piece = hound_01;
-                }
-                if (row == hound_02.getRowPosition() && col == hound_02.getColPosition()) {
-                    piece = hound_02;
-                }
-                if (row == hound_03.getRowPosition() && col == hound_03.getColPosition()) {
-                    piece = hound_03;
-                }
-                if (row == hound_04.getRowPosition() && col == hound_04.getColPosition()) {
-                    piece = hound_04;
-                }
-                if (row == fox.getRowPosition() && col == fox.getColPosition()) {
-                    piece = fox;
-                }
-                if (piece != null) {
-                    piece.radiusProperty().bind(
-                            Bindings.when(stackPaneField.heightProperty().lessThan(stackPaneField.widthProperty())).
-                                    then(stackPaneField.heightProperty()).otherwise(stackPaneField.widthProperty()).subtract(10).divide(2)
-                    );
-                    stackPaneField.getChildren().add(piece);
-                }
-
+                setStartBoard(stackPaneField,row,col);
 
                 stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
@@ -189,8 +166,7 @@ public class FoxAndHoundsGame extends Application {
             File file = fileChooser.showOpenDialog(null);
             if (file != null && file.getAbsolutePath().endsWith(".txt")) {
                 open(file, stackPaneFields);
-            }
-            else{
+            } else {
                 alertWrongExtension.showAndWait();
             }
         });
@@ -232,44 +208,84 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void open(File file, StackPane[][] stackPaneFields) {
-        deletePieces(stackPaneFields);
-        Scanner lineScanner = null;
         try {
-            lineScanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        int tmpRow;
-        int tmpCol;
-        String tmpType;
-        String tmpLine;
-        String[] tmpData;
-        int houndCount = 0;
-        while (lineScanner.hasNextLine()) {
-            tmpLine = lineScanner.nextLine();
-            tmpData = tmpLine.split(" ");
-            tmpType = tmpData[0];
-            if (tmpType.equals("last")) {
-                if (tmpData[1].equals("FOX")) {
-                    lastMove[0] = fox;
-                } else {
-                    lastMove[0] = hounds[0];
-                }
-            } else {
-                tmpRow = Integer.parseInt(tmpData[1]);
-                tmpCol = Integer.parseInt(tmpData[2]);
-                if (tmpType.equals("FOX")) {
-                    fox.setNewPosition(tmpRow, tmpCol);
-                    stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
-                } else {
-                    hounds[houndCount].setNewPosition(tmpRow, tmpCol);
-                    stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
-                    houndCount++;
-                }
+            deletePieces(stackPaneFields);
+            Scanner lineScanner = null;
+            try {
+                lineScanner = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
 
+            int tmpRow;
+            int tmpCol;
+            String tmpType;
+            String tmpLine;
+            String[] tmpData;
+            int houndCount = 0;
+            while (lineScanner.hasNextLine()) {
+                tmpLine = lineScanner.nextLine();
+                tmpData = tmpLine.split(" ");
+                tmpType = tmpData[0];
+                if (tmpType.equals("last")) {
+                    if (tmpData[1].equals("FOX")) {
+                        lastMove[0] = fox;
+                    } else {
+                        lastMove[0] = hounds[0];
+                    }
+                } else {
+                    tmpRow = Integer.parseInt(tmpData[1]);
+                    tmpCol = Integer.parseInt(tmpData[2]);
+                    if (tmpType.equals("FOX")) {
+                        fox.setNewPosition(tmpRow, tmpCol);
+                        stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                    } else {
+                        hounds[houndCount].setNewPosition(tmpRow, tmpCol);
+                        stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
+                        houndCount++;
+                    }
+                }
+
+            }
+        } catch (NumberFormatException numberFormatException) {
+            Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
+            alertWrongDataEx.setHeaderText(null);
+            alertWrongDataEx.setContentText("WRONG DATA FORMAT!");
+            alertWrongDataEx.showAndWait();
+            deletePieces(stackPaneFields);
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    setStartBoard(stackPaneFields[row][col],row,col);
+                }
+            }
         }
+    }
+
+    private void setStartBoard(StackPane stackPaneField, int row, int col) {
+        Piece piece = null;
+        if (row == 0 && col == 1) {
+            piece = hound_01;
+        }
+        if (row == 0 && col == 3) {
+            piece = hound_02;
+        }
+        if (row == 0 && col == 5) {
+            piece = hound_03;
+        }
+        if (row == 0 && col == 7) {
+            piece = hound_04;
+        }
+        if (row == 7 && col == 0) {
+            piece = fox;
+        }
+        if (piece != null) {
+            piece.radiusProperty().bind(
+                    Bindings.when(stackPaneField.heightProperty().lessThan(stackPaneField.widthProperty())).
+                            then(stackPaneField.heightProperty()).otherwise(stackPaneField.widthProperty()).subtract(10).divide(2)
+            );
+            stackPaneField.getChildren().add(piece);
+        }
+
     }
 
     private boolean ifContainPiece(StackPane stackPane) {
