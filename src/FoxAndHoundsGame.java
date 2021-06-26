@@ -229,7 +229,8 @@ public class FoxAndHoundsGame extends Application {
                     }
                 }
             }
-            printWriter.print("last " + lastMove[0]);
+            printWriter.print("last " + lastMove[0] + '\n');
+            printWriter.print("timer " + timerInput[0]);
             printWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -259,9 +260,13 @@ public class FoxAndHoundsGame extends Application {
                 if (tmpType.equals("last")) {
                     if (tmpData[1].equals("FOX")) {
                         lastMove[0] = fox;
+                         whoseTurn.setText(PieceType.HOUNDS.toString());
                     } else {
                         lastMove[0] = hounds[0];
+                        whoseTurn.setText(PieceType.FOX.toString());
                     }
+                } else if (tmpType.equals("timer")) {
+                        timerInput[0]= Integer.parseInt(tmpData[1]);
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
