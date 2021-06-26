@@ -142,10 +142,12 @@ public class FoxAndHoundsGame extends Application {
         alertWrongExtension.setContentText("Wrong file extension");
         menuItemOpen.setOnAction(actionEvent -> {
             File file = fileChooser.showOpenDialog(null);
-            if (file != null && file.getAbsolutePath().endsWith(".txt")) {
-                open(file, stackPaneFields);
-            } else {
-                alertWrongExtension.showAndWait(); // TODO wyswietla sie niepotrzebnie po anaulowaniu otwarcia pliku
+            if (file != null) {
+                if (file.getAbsolutePath().endsWith(".txt")) {
+                    open(file, stackPaneFields);
+                } else {
+                    alertWrongExtension.showAndWait();
+                }
             }
         });
 
@@ -315,7 +317,7 @@ public class FoxAndHoundsGame extends Application {
 
     }
 
-    void timer() {
+    private void timer() {
         Timeline timeline = new Timeline();
         whoseTurn.setText("turn: " + PieceType.FOX);
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), e -> {
