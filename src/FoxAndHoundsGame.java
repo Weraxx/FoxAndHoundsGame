@@ -37,20 +37,23 @@ public class FoxAndHoundsGame extends Application {
     private final Menu timerLabel = new Menu();
     private final Menu whoseTurn = new Menu();
     private final int[] timerInput = {30};
+    private Scene scene;
+    private final Timeline checkingWinner = new Timeline();
+    private final Timeline timer = new Timeline();
 
     StackPane[][] stackPaneFields = new StackPane[8][8];
     BoardSquare[][] boardSquares = new BoardSquare[8][8];
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(getStartWindow(primaryStage), 800, 600);
-
+        scene = new Scene(getStartWindow(), 800, 600);
+        timer();
         primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private StackPane getStartWindow(Stage primaryStage) {
+    private StackPane getStartWindow() {
         StackPane startWindow = new StackPane();
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
@@ -60,13 +63,34 @@ public class FoxAndHoundsGame extends Application {
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
         imageView.fitWidthProperty().bind(startWindow.widthProperty());
         startWindow.getChildren().addAll(imageView, startButton);
-
-        startButton.setOnMouseClicked(e -> {
-            primaryStage.setScene(new Scene(getBoard(), 600, 600));
-            primaryStage.show();
-        });
+        startButton.setOnMouseClicked(mouseEvent -> scene.setRoot(getBoard()));
 
         return startWindow;
+    }
+
+    private VBox getWinnerWindow() {
+        VBox getWinnerWindow = new VBox();
+        getWinnerWindow.setAlignment(Pos.CENTER);
+
+        Label labelWinner = new Label("Fox is the winner!");
+        labelWinner.setAlignment(Pos.TOP_CENTER);
+
+        Image image = new Image("fox.png");
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(300);
+        imageView.setFitHeight(300);
+
+        Button buttonPlayAgain = new Button("Play again");
+        buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+
+        buttonPlayAgain.setOnMouseClicked(e -> {
+            scene.setRoot(getBoard());
+            timer.play();
+        });
+
+        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain);
+
+        return getWinnerWindow;
     }
 
     private VBox getBoard() {
@@ -108,25 +132,8 @@ public class FoxAndHoundsGame extends Application {
             }
         }
 
-        Alert alertWinnerOfTheGame = new Alert(Alert.AlertType.INFORMATION);
-        alertWinnerOfTheGame.setTitle("WINNER");
-        alertWinnerOfTheGame.setHeaderText(null);
-        Timeline timeline = new Timeline();
-        KeyFrame keyFrame = new KeyFrame(Duration.millis(1), e -> {
-            if (areHoundsWinner()) {
-                timeline.stop();
-                alertWinnerOfTheGame.setContentText("HOUNDS ARE THE WINNER");
-                alertWinnerOfTheGame.show();
-            }
-            if (isTheFoxWinner()) {
-                timeline.stop();
-                alertWinnerOfTheGame.setContentText("FOX IS THE WINNER");
-                alertWinnerOfTheGame.show();
-            }
-        });
-        timeline.getKeyFrames().add(keyFrame);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        checkingWinner.play();
+        timer.play();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
@@ -165,7 +172,6 @@ public class FoxAndHoundsGame extends Application {
 
         board.setPrefSize(600, 600);
         boardWithMenuBar.getChildren().add(board);
-        timer();
         return boardWithMenuBar;
     }
 
@@ -260,13 +266,13 @@ public class FoxAndHoundsGame extends Application {
                 if (tmpType.equals("last")) {
                     if (tmpData[1].equals("FOX")) {
                         lastMove[0] = fox;
-                         whoseTurn.setText(PieceType.HOUNDS.toString());
+                        whoseTurn.setText(PieceType.HOUNDS.toString());
                     } else {
                         lastMove[0] = hounds[0];
                         whoseTurn.setText(PieceType.FOX.toString());
                     }
                 } else if (tmpType.equals("timer")) {
-                        timerInput[0]= Integer.parseInt(tmpData[1]);
+                    timerInput[0] = Integer.parseInt(tmpData[1]);
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
@@ -293,6 +299,15 @@ public class FoxAndHoundsGame extends Application {
                 }
             }
         }
+    }
+
+    private void resetGame() {
+        fox.setNewPosition(7,0);
+        hound_01.setNewPosition(0,1);
+        hound_02.setNewPosition(0,3);
+        hound_03.setNewPosition(0,5);
+        hound_04.setNewPosition(0,7);
+        lastMove[0]=hounds[(int) (Math.random() + 3)];
     }
 
     private void setStartBoard(StackPane stackPaneField, int row, int col) {
@@ -323,9 +338,24 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void timer() {
-        Timeline timeline = new Timeline();
+        KeyFrame keyFrameCheckWin = new KeyFrame(Duration.millis(1), e -> {
+            if (areHoundsWinner()) {
+                resetGame();
+                timer.stop();
+                checkingWinner.stop();
+                scene.setRoot(getWinnerWindow());
+            }
+            if (isTheFoxWinner()) {
+                resetGame();
+                timer.stop();
+                checkingWinner.stop();
+                scene.setRoot(getWinnerWindow());
+            }
+        });
+        checkingWinner.getKeyFrames().add(keyFrameCheckWin);
+        checkingWinner.setCycleCount(Timeline.INDEFINITE);
         whoseTurn.setText("turn: " + PieceType.FOX);
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), e -> {
+        KeyFrame keyFrameTimer = new KeyFrame(Duration.seconds(1), e -> {
             if (timerInput[0] < 10) {
                 timerLabel.setText("time: 00:0" + timerInput[0]);
             } else {
@@ -343,9 +373,8 @@ public class FoxAndHoundsGame extends Application {
                 timerInput[0] = 30;
             }
         });
-        timeline.getKeyFrames().add(keyFrame);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        timer.getKeyFrames().add(keyFrameTimer);
+        timer.setCycleCount(Timeline.INDEFINITE);
     }
 
     private boolean ifContainPiece(StackPane stackPane) {
