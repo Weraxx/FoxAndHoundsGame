@@ -7,6 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -31,6 +34,12 @@ public class FoxAndHoundsGame extends Application {
     private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
     private static final Piece[] lastMove = {hound_01};
     private static final Piece[] hounds = {hound_01, hound_02, hound_03, hound_04};
+    private final Menu timerLabel = new Menu();
+    private final Menu whoseTurn = new Menu();
+    private final int[] timerInput = {30};
+
+    StackPane[][] stackPaneFields = new StackPane[8][8];
+    BoardSquare[][] boardSquares = new BoardSquare[8][8];
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -60,16 +69,19 @@ public class FoxAndHoundsGame extends Application {
         return startWindow;
     }
 
-    StackPane[][] stackPaneFields = new StackPane[8][8];
-    BoardSquare[][] boardSquares = new BoardSquare[8][8];
-
     private VBox getBoard() {
         MenuBar menuBar = new MenuBar();
-        Menu menu = new Menu("Options");
-        menuBar.getMenus().add(menu);
+        Menu menu = new Menu("options");
+        menuBar.getMenus().addAll(menu, whoseTurn, timerLabel);
         MenuItem menuItemSave = new MenuItem("save");
         MenuItem menuItemOpen = new MenuItem("open");
         menu.getItems().addAll(menuItemSave, menuItemOpen);
+
+        KeyCodeCombination openKeyCode = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
+        menuItemOpen.setAccelerator(openKeyCode);
+
+        KeyCodeCombination saveKeyCode = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+        menuItemSave.setAccelerator(saveKeyCode);
 
         VBox boardWithMenuBar = new VBox(menuBar);
 
@@ -82,50 +94,16 @@ public class FoxAndHoundsGame extends Application {
             for (int col = 0; col < ROW_COUNT; ++col) {
 
                 StackPane stackPaneField = new StackPane();
-
-                BoardSquare boardSquare;
-                if ((row + col) % 2 == 0) {
-                    boardSquare = new BoardSquare(Color.WHITESMOKE, row, col);
-                } else {
-                    boardSquare = new BoardSquare(Color.GRAY, row, col);
-                }
-                stackPaneField.getChildren().add(boardSquare);
-                boardSquares[row][col] = boardSquare;
                 stackPaneFields[row][col] = stackPaneField;
 
-                setStartBoard(stackPaneField,row,col);
+                BoardSquare boardSquare = getBoardSquare(row, col, stackPaneField);
+
+                setStartBoard(stackPaneField, row, col);
 
                 stackPaneField.setOnMouseEntered(e -> boardSquare.highlight());
                 stackPaneField.setOnMouseExited(e -> boardSquare.blacken());
-                Alert movementWarning = new Alert(Alert.AlertType.WARNING);
-                movementWarning.setHeaderText(null);
-                stackPaneField.setOnMouseClicked(e -> {
-                    if (ifContainPiece(stackPaneField) && !ifLastClickOnPiece[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
-                        ifLastClickOnPiece[0] = true;
-                        showPossibilities(boardSquares, stackPaneField, deliverObjectPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
-                        tmpPiece[0] = deliverObjectPiece(stackPaneField);
-                    } else if (!ifContainPiece(stackPaneField) && ifLastClickOnPiece[0]) {
-                        int newRow = boardSquare.getBoardSquareRow();
-                        int newCol = boardSquare.getBoardSquareCol();
-                        if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
-                            stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
-                            tmpPiece[0].setNewPosition(newRow, newCol);
-                            lastMove[0] = deliverObjectPiece(stackPaneField);
-                        }
-                        hidePossibilities(boardSquares);
-                        ifLastClickOnPiece[0] = false;
-                    } else if (ifLastClickOnPiece[0]) {
-                        hidePossibilities(boardSquares);
-                        ifLastClickOnPiece[0] = false;
-                    } else {
-                        if (lastMove[0].getType() == PieceType.FOX) {
-                            movementWarning.setContentText("HOUNDS TURN");
-                        } else {
-                            movementWarning.setContentText("FOX'S TURN");
-                        }
-                        movementWarning.showAndWait();
-                    }
-                });
+                stackPaneField.setOnMouseClicked(e -> movementCheck(ifLastClickOnPiece, tmpPiece, stackPaneField, boardSquare));
+
                 board.add(stackPaneField, col, row);
             }
         }
@@ -167,7 +145,7 @@ public class FoxAndHoundsGame extends Application {
             if (file != null && file.getAbsolutePath().endsWith(".txt")) {
                 open(file, stackPaneFields);
             } else {
-                alertWrongExtension.showAndWait();
+                alertWrongExtension.showAndWait(); // TODO wyswietla sie niepotrzebnie po anaulowaniu otwarcia pliku
             }
         });
 
@@ -185,7 +163,56 @@ public class FoxAndHoundsGame extends Application {
 
         board.setPrefSize(600, 600);
         boardWithMenuBar.getChildren().add(board);
+        timer();
         return boardWithMenuBar;
+    }
+
+    private BoardSquare getBoardSquare(int row, int col, StackPane stackPaneField) {
+        BoardSquare boardSquare;
+        if ((row + col) % 2 == 0) {
+            boardSquare = new BoardSquare(Color.WHITESMOKE, row, col);
+        } else {
+            boardSquare = new BoardSquare(Color.GRAY, row, col);
+        }
+        stackPaneField.getChildren().add(boardSquare);
+        boardSquares[row][col] = boardSquare;
+        return boardSquare;
+    }
+
+    private void movementCheck(boolean[] ifLastClickOnPiece, Piece[] tmpPiece, StackPane stackPaneField, BoardSquare boardSquare) {
+        Alert movementWarning = new Alert(Alert.AlertType.WARNING);
+        movementWarning.setHeaderText(null);
+        if (ifContainPiece(stackPaneField) && !ifLastClickOnPiece[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
+            ifLastClickOnPiece[0] = true;
+            showPossibilities(boardSquares, stackPaneField, deliverObjectPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
+            tmpPiece[0] = deliverObjectPiece(stackPaneField);
+        } else if (!ifContainPiece(stackPaneField) && ifLastClickOnPiece[0]) {
+            int newRow = boardSquare.getBoardSquareRow();
+            int newCol = boardSquare.getBoardSquareCol();
+            if (isMovementPossibleFox(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol) || isMovementPossibleHounds(tmpPiece[0], tmpPiece[0].getRowPosition(), tmpPiece[0].getColPosition(), newRow, newCol)) {
+                stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
+                tmpPiece[0].setNewPosition(newRow, newCol);
+                lastMove[0] = deliverObjectPiece(stackPaneField);
+                timerInput[0] = 30;
+                if (lastMove[0].getType() == PieceType.HOUNDS) {
+                    whoseTurn.setText("turn: " + PieceType.FOX);
+                } else {
+                    whoseTurn.setText("turn: " + PieceType.HOUNDS);
+                }
+            }
+            hidePossibilities(boardSquares);
+            ifLastClickOnPiece[0] = false;
+        } else if (ifLastClickOnPiece[0]) {
+            hidePossibilities(boardSquares);
+            ifLastClickOnPiece[0] = false;
+        } else {
+            if (lastMove[0].getType() == PieceType.FOX) {
+                movementWarning.setContentText("HOUNDS TURN");
+            } else {
+                movementWarning.setContentText("FOX'S TURN");
+            }
+            movementWarning.showAndWait();
+        }
     }
 
     private void save(File file, StackPane[][] stackPaneFields) {
@@ -255,7 +282,7 @@ public class FoxAndHoundsGame extends Application {
             deletePieces(stackPaneFields);
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    setStartBoard(stackPaneFields[row][col],row,col);
+                    setStartBoard(stackPaneFields[row][col], row, col);
                 }
             }
         }
@@ -286,6 +313,32 @@ public class FoxAndHoundsGame extends Application {
             stackPaneField.getChildren().add(piece);
         }
 
+    }
+
+    void timer() {
+        Timeline timeline = new Timeline();
+        whoseTurn.setText("turn: " + PieceType.FOX);
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), e -> {
+            if (timerInput[0] < 10) {
+                timerLabel.setText("time: 00:0" + timerInput[0]);
+            } else {
+                timerLabel.setText("time: 00:" + timerInput[0]);
+            }
+            timerInput[0] = timerInput[0] - 1;
+            if (timerInput[0] == 0) {
+                if (lastMove[0].getType() == PieceType.HOUNDS) {
+                    lastMove[0] = fox;
+                    whoseTurn.setText("turn: " + PieceType.HOUNDS);
+                } else {
+                    lastMove[0] = hounds[(int) (Math.random() + 3)];
+                    whoseTurn.setText("turn: " + PieceType.FOX);
+                }
+                timerInput[0] = 30;
+            }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     private boolean ifContainPiece(StackPane stackPane) {
