@@ -60,18 +60,46 @@ public class FoxAndHoundsGame extends Application {
 
     private StackPane getStartWindow(Stage primaryStage) {
         StackPane startWindow = new StackPane();
+
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
+        startButton.setId("buttonStart");
+        VBox.setMargin(startButton, new Insets(85, 0, 0, 0));
         startWindow.setAlignment(Pos.CENTER);
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
         ImageView imageView = new ImageView(image);
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
         imageView.fitWidthProperty().bind(startWindow.widthProperty());
 
-        RadioButtonDialog radioButtonDialog = new RadioButtonDialog();
-        startButton.setId("buttonStart");
+        Button openButton = new Button("OPEN");
+        openButton.setId("buttonStart");
+        openButton.setPrefSize(150, 50);
+        VBox.setMargin(openButton, new Insets(10, 0, 0, 0));
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
+        Alert alertWrongExtension = new Alert(Alert.AlertType.WARNING);
+        alertWrongExtension.setHeaderText(null);
+        alertWrongExtension.setContentText("Wrong file extension");
+        openButton.setOnAction(actionEvent -> {
+            getBoard();
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+                if (file.getAbsolutePath().endsWith(".txt")) {
+                    open(file, stackPaneFields);
+                    scene = new Scene(getBoard(), 600, 600);
+                    primaryStage.setScene(scene);
+                    primaryStage.show();
+                } else {
+                    alertWrongExtension.showAndWait();
+                }
+            }
+        });
 
-        startWindow.getChildren().addAll(imageView, startButton);
+        RadioButtonDialog radioButtonDialog = new RadioButtonDialog();
+
         startButton.setOnMouseClicked(mouseEvent -> {
             radioButtonDialog.showAndWait();
             if (radioButtonDialog.isButtonOK()) {
@@ -82,6 +110,9 @@ public class FoxAndHoundsGame extends Application {
                 primaryStage.show();
             }
         });
+
+        vBox.getChildren().addAll(startButton, openButton);
+        startWindow.getChildren().addAll(imageView, vBox);
 
         return startWindow;
     }
@@ -485,8 +516,10 @@ public class FoxAndHoundsGame extends Application {
     private void deletePieces(StackPane[][] stackPaneFields) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (ifContainPiece(stackPaneFields[row][col])) {
-                    stackPaneFields[row][col].getChildren().remove(1);
+                if (stackPaneFields[row][col] != null) {
+                    if (ifContainPiece(stackPaneFields[row][col])) {
+                        stackPaneFields[row][col].getChildren().remove(1);
+                    }
                 }
             }
         }
