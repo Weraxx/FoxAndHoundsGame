@@ -13,10 +13,10 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -26,28 +26,32 @@ public class FoxAndHoundsGame extends Application {
 
     private static final int COL_COUNT = 8;
     private static final int ROW_COUNT = 8;
-
     private static final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
     private static final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
     private static final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
     private static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
-    private static final Piece fox = new Piece(PieceType.FOX, 7, 0);
-    private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
     private static final Piece[] lastMove = {hound_01};
     private static final Piece[] hounds = {hound_01, hound_02, hound_03, hound_04};
+    private static int pos;
+    private static final Piece fox = new Piece(PieceType.FOX, 7, pos);
+    private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
     private final Menu timerLabel = new Menu();
     private final Menu whoseTurn = new Menu();
     private final int[] timerInput = {30};
-    private Scene scene;
     private final Timeline checkingWinner = new Timeline();
     private final Timeline timer = new Timeline();
-
     StackPane[][] stackPaneFields = new StackPane[8][8];
     BoardSquare[][] boardSquares = new BoardSquare[8][8];
+    private Scene scene;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         scene = new Scene(getStartWindow(primaryStage), 800, 600);
+        scene.getStylesheets().add("style.css");
         timer();
         primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
@@ -59,15 +63,25 @@ public class FoxAndHoundsGame extends Application {
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
         startWindow.setAlignment(Pos.CENTER);
+
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
         ImageView imageView = new ImageView(image);
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
         imageView.fitWidthProperty().bind(startWindow.widthProperty());
+
+        RadioButtonDialog radioButtonDialog = new RadioButtonDialog();
+        startButton.setId("buttonStart");
+
         startWindow.getChildren().addAll(imageView, startButton);
         startButton.setOnMouseClicked(mouseEvent -> {
-            scene = new Scene(getBoard(), 600, 600);
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            radioButtonDialog.showAndWait();
+            if (radioButtonDialog.isButtonOK()) {
+                pos = radioButtonDialog.getPos();
+                fox.setNewPosition(7, pos);
+                scene = new Scene(getBoard(), 600, 600);
+                primaryStage.setScene(scene);
+                primaryStage.show();
+            }
         });
 
         return startWindow;
@@ -93,7 +107,7 @@ public class FoxAndHoundsGame extends Application {
         Button buttonPlayAgain = new Button("Play again");
         buttonPlayAgain.setId("buttonPlayAgain");
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
-        VBox.setMargin(buttonPlayAgain, new Insets(20,0,0,0));
+        VBox.setMargin(buttonPlayAgain, new Insets(20, 0, 0, 0));
 
         scene.getStylesheets().add("style.css");
 
@@ -124,12 +138,12 @@ public class FoxAndHoundsGame extends Application {
         imageView.setFitWidth(400);
         imageView.setFitHeight(400);
 
+        scene.getStylesheets().add("style.css");
+
         Button buttonPlayAgain = new Button("Play again");
         buttonPlayAgain.setId("buttonPlayAgain");
-        VBox.setMargin(buttonPlayAgain, new Insets(20,0,0,0));
+        VBox.setMargin(buttonPlayAgain, new Insets(20, 0, 0, 0));
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
-
-        scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
             scene.setRoot(getBoard());
@@ -350,7 +364,7 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void resetGame() {
-        fox.setNewPosition(7, 0);
+        fox.setNewPosition(7, pos);
         hound_01.setNewPosition(0, 1);
         hound_02.setNewPosition(0, 3);
         hound_03.setNewPosition(0, 5);
@@ -372,7 +386,7 @@ public class FoxAndHoundsGame extends Application {
         if (row == 0 && col == 7) {
             piece = hound_04;
         }
-        if (row == 7 && col == 0) {
+        if (row == 7 && col == pos) {
             piece = fox;
         }
         if (piece != null) {
@@ -591,9 +605,5 @@ public class FoxAndHoundsGame extends Application {
             areHoundsWinner = false;
         }
         return areHoundsWinner;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

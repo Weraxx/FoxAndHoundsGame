@@ -12,3 +12,18 @@
 -fx-background-radius: 5;
 -fx-padding: 5;
  }
+
+#buttonStart{
+ -fx-text-fill: "DARKRED";
+ -fx-font-weight: bold;
+ -fx-font: 20px "sans-serif";
+ -fx-background-color: #DFB951BB;
+ -fx-border-radius: 5;
+ -fx-background-radius: 5;
+ -fx-padding: 5;
+  }
+
+#textDialog{
+-fx-font: 20px "sans-serif";
+-fx-text-fill: "DARKRED";
+}
