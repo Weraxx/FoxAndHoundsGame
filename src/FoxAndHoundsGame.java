@@ -15,7 +15,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -76,7 +75,12 @@ public class FoxAndHoundsGame extends Application {
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
-        Label labelWinner = new Label("Fox is the winner!");
+        BackgroundFill backgroundFill = new BackgroundFill(Color.FLORALWHITE, null, null);
+        Background background = new Background(backgroundFill);
+        getWinnerWindow.setBackground(background);
+
+        Label labelWinner = new Label("FOX IS THE WINNER!");
+        labelWinner.setId("labelWinner");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
         Image image = new Image("fox.png");
@@ -86,6 +90,8 @@ public class FoxAndHoundsGame extends Application {
 
         Button buttonPlayAgain = new Button("Play again");
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+
+        scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
             scene.setRoot(getBoard());
@@ -101,7 +107,12 @@ public class FoxAndHoundsGame extends Application {
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
-        Label labelWinner = new Label("Hounds are the winner!");
+        BackgroundFill backgroundFill = new BackgroundFill(Color.FLORALWHITE, null, null);
+        Background background = new Background(backgroundFill);
+        getWinnerWindow.setBackground(background);
+
+        Label labelWinner = new Label("HOUNDS ARE THE WINNERS!");
+        labelWinner.setId("labelWinner");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
         Image image = new Image("fox.png");
@@ -111,6 +122,8 @@ public class FoxAndHoundsGame extends Application {
 
         Button buttonPlayAgain = new Button("Play again");
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+
+        scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
             scene.setRoot(getBoard());
