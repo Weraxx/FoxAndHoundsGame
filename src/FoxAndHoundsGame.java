@@ -46,14 +46,14 @@ public class FoxAndHoundsGame extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        scene = new Scene(getStartWindow(), 800, 600);
+        scene = new Scene(getStartWindow(primaryStage), 800, 600);
         timer();
         primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private StackPane getStartWindow() {
+    private StackPane getStartWindow(Stage primaryStage) {
         StackPane startWindow = new StackPane();
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
@@ -63,16 +63,45 @@ public class FoxAndHoundsGame extends Application {
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
         imageView.fitWidthProperty().bind(startWindow.widthProperty());
         startWindow.getChildren().addAll(imageView, startButton);
-        startButton.setOnMouseClicked(mouseEvent -> scene.setRoot(getBoard()));
+        startButton.setOnMouseClicked(mouseEvent -> {
+            scene = new Scene(getBoard(), 600, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        });
 
         return startWindow;
     }
 
-    private VBox getWinnerWindow() {
+    private VBox getFoxWinnerWindow() {
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
         Label labelWinner = new Label("Fox is the winner!");
+        labelWinner.setAlignment(Pos.TOP_CENTER);
+
+        Image image = new Image("fox.png");
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(300);
+        imageView.setFitHeight(300);
+
+        Button buttonPlayAgain = new Button("Play again");
+        buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+
+        buttonPlayAgain.setOnMouseClicked(e -> {
+            scene.setRoot(getBoard());
+            timer.play();
+        });
+
+        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain);
+
+        return getWinnerWindow;
+    }
+
+    private VBox getHoundsWinnerWindow() {
+        VBox getWinnerWindow = new VBox();
+        getWinnerWindow.setAlignment(Pos.CENTER);
+
+        Label labelWinner = new Label("Hounds are the winner!");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
         Image image = new Image("fox.png");
@@ -302,12 +331,12 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void resetGame() {
-        fox.setNewPosition(7,0);
-        hound_01.setNewPosition(0,1);
-        hound_02.setNewPosition(0,3);
-        hound_03.setNewPosition(0,5);
-        hound_04.setNewPosition(0,7);
-        lastMove[0]=hounds[(int) (Math.random() + 3)];
+        fox.setNewPosition(7, 0);
+        hound_01.setNewPosition(0, 1);
+        hound_02.setNewPosition(0, 3);
+        hound_03.setNewPosition(0, 5);
+        hound_04.setNewPosition(0, 7);
+        lastMove[0] = hounds[(int) (Math.random() + 3)];
     }
 
     private void setStartBoard(StackPane stackPaneField, int row, int col) {
@@ -343,13 +372,13 @@ public class FoxAndHoundsGame extends Application {
                 resetGame();
                 timer.stop();
                 checkingWinner.stop();
-                scene.setRoot(getWinnerWindow());
+                scene.setRoot(getHoundsWinnerWindow());
             }
             if (isTheFoxWinner()) {
                 resetGame();
                 timer.stop();
                 checkingWinner.stop();
-                scene.setRoot(getWinnerWindow());
+                scene.setRoot(getFoxWinnerWindow());
             }
         });
         checkingWinner.getKeyFrames().add(keyFrameCheckWin);
