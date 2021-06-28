@@ -52,7 +52,7 @@ public class FoxAndHoundsGame extends Application {
     public void start(Stage primaryStage) {
         scene = new Scene(getStartWindow(primaryStage), 800, 600);
         scene.getStylesheets().add("style.css");
-        timer();
+        timer(primaryStage);
         primaryStage.setTitle("Fox and Hounds");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -63,7 +63,6 @@ public class FoxAndHoundsGame extends Application {
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
         startWindow.setAlignment(Pos.CENTER);
-
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
         ImageView imageView = new ImageView(image);
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
@@ -87,7 +86,7 @@ public class FoxAndHoundsGame extends Application {
         return startWindow;
     }
 
-    private VBox getFoxWinnerWindow() {
+    private VBox getFoxWinnerWindow(Stage primaryStage) {
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
@@ -105,9 +104,14 @@ public class FoxAndHoundsGame extends Application {
         imageView.setFitHeight(400);
 
         Button buttonPlayAgain = new Button("Play again");
-        buttonPlayAgain.setId("buttonPlayAgain");
-        buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+        buttonPlayAgain.setId("button");
+        buttonPlayAgain.setAlignment(Pos.CENTER);
         VBox.setMargin(buttonPlayAgain, new Insets(20, 0, 0, 0));
+
+        Button buttonBackToMenu = new Button("Back to menu");
+        buttonBackToMenu.setId("button");
+        VBox.setMargin(buttonBackToMenu, new Insets(10, 0, 0, 0));
+        buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
 
         scene.getStylesheets().add("style.css");
 
@@ -116,12 +120,19 @@ public class FoxAndHoundsGame extends Application {
             timer.play();
         });
 
-        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain);
+        buttonBackToMenu.setOnMouseClicked(e -> {
+            scene = new Scene(getStartWindow(primaryStage), 800, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            scene.getStylesheets().add("style.css");
+        });
+
+        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain, buttonBackToMenu);
 
         return getWinnerWindow;
     }
 
-    private VBox getHoundsWinnerWindow() {
+    private VBox getHoundsWinnerWindow(Stage primaryStage) {
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
@@ -141,16 +152,30 @@ public class FoxAndHoundsGame extends Application {
         scene.getStylesheets().add("style.css");
 
         Button buttonPlayAgain = new Button("Play again");
-        buttonPlayAgain.setId("buttonPlayAgain");
+        buttonPlayAgain.setId("button");
+        buttonPlayAgain.setAlignment(Pos.CENTER);
         VBox.setMargin(buttonPlayAgain, new Insets(20, 0, 0, 0));
+
+        Button buttonBackToMenu = new Button("Back to menu");
+        buttonBackToMenu.setId("button");
+        VBox.setMargin(buttonBackToMenu, new Insets(10, 0, 0, 0));
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+
+        scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
             scene.setRoot(getBoard());
             timer.play();
         });
 
-        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain);
+        buttonBackToMenu.setOnMouseClicked(e -> {
+            scene = new Scene(getStartWindow(primaryStage), 800, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            scene.getStylesheets().add("style.css");
+        });
+
+        getWinnerWindow.getChildren().addAll(labelWinner, imageView, buttonPlayAgain, buttonBackToMenu);
 
         return getWinnerWindow;
     }
@@ -399,19 +424,19 @@ public class FoxAndHoundsGame extends Application {
 
     }
 
-    private void timer() {
+    private void timer(Stage primaryStage) {
         KeyFrame keyFrameCheckWin = new KeyFrame(Duration.millis(1), e -> {
             if (areHoundsWinner()) {
                 resetGame();
                 timer.stop();
                 checkingWinner.stop();
-                scene.setRoot(getHoundsWinnerWindow());
+                scene.setRoot(getHoundsWinnerWindow(primaryStage));
             }
             if (isTheFoxWinner()) {
                 resetGame();
                 timer.stop();
                 checkingWinner.stop();
-                scene.setRoot(getFoxWinnerWindow());
+                scene.setRoot(getFoxWinnerWindow(primaryStage));
             }
         });
         checkingWinner.getKeyFrames().add(keyFrameCheckWin);

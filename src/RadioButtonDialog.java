@@ -33,7 +33,7 @@ public class RadioButtonDialog extends Dialog<RadioButton> {
         radioButtonLeft.setToggleGroup(toggleGroup);
         radioButtonRight.setToggleGroup(toggleGroup);
         Button button = new Button("OK");
-        button.setId("buttonPlayAgain");
+        button.setId("button");
         dialogPane.getScene().getStylesheets().add("style.css");
         gridPane.setBackground(new Background(new BackgroundFill(Color.FLORALWHITE, null, null)));
         dialogPane.setBackground(new Background(new BackgroundFill(Color.FLORALWHITE, null, null)));

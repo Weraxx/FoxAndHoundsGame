@@ -4,10 +4,10 @@
 -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
 }
 
-#buttonPlayAgain{
--fx-text-fill: #006464;
+#button{
+-fx-text-fill: "DARKRED";
 -fx-font: 18px "sans-serif";
--fx-background-color: #DFB951;
+-fx-background-color: #DFB951BB;
 -fx-border-radius: 5;
 -fx-background-radius: 5;
 -fx-padding: 5;
@@ -24,6 +24,6 @@
   }
 
 #textDialog{
--fx-font: 20px "sans-serif";
+-fx-font: 18px "sans-serif";
 -fx-text-fill: "DARKRED";
 }
