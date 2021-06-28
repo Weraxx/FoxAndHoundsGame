@@ -3,3 +3,12 @@
 -fx-text-fill: "DARKRED";
 -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
 }
+
+#buttonPlayAgain{
+-fx-text-fill: #006464;
+-fx-font: 18px "sans-serif";
+-fx-background-color: #DFB951;
+-fx-border-radius: 5;
+-fx-background-radius: 5;
+-fx-padding: 5;
+ }

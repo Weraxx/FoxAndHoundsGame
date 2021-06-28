@@ -2,6 +2,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,6 +13,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -85,11 +87,13 @@ public class FoxAndHoundsGame extends Application {
 
         Image image = new Image("fox.png");
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(300);
-        imageView.setFitHeight(300);
+        imageView.setFitWidth(400);
+        imageView.setFitHeight(400);
 
         Button buttonPlayAgain = new Button("Play again");
+        buttonPlayAgain.setId("buttonPlayAgain");
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
+        VBox.setMargin(buttonPlayAgain, new Insets(20,0,0,0));
 
         scene.getStylesheets().add("style.css");
 
@@ -115,12 +119,14 @@ public class FoxAndHoundsGame extends Application {
         labelWinner.setId("labelWinner");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
-        Image image = new Image("fox.png");
+        Image image = new Image("hounds.png");
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(300);
-        imageView.setFitHeight(300);
+        imageView.setFitWidth(400);
+        imageView.setFitHeight(400);
 
         Button buttonPlayAgain = new Button("Play again");
+        buttonPlayAgain.setId("buttonPlayAgain");
+        VBox.setMargin(buttonPlayAgain, new Insets(20,0,0,0));
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
 
         scene.getStylesheets().add("style.css");
