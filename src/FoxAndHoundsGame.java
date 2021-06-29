@@ -84,12 +84,12 @@ public class FoxAndHoundsGame extends Application {
         alertWrongExtension.setHeaderText(null);
         alertWrongExtension.setContentText("Wrong file extension");
         openButton.setOnAction(actionEvent -> {
-            getBoard();
+            getBoard(primaryStage);
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
                 if (file.getAbsolutePath().endsWith(".txt")) {
-                    open(file, stackPaneFields);
-                    scene = new Scene(getBoard(), 600, 600);
+                    open(file, stackPaneFields, primaryStage);
+                    scene = new Scene(getBoard(primaryStage), 600, 600);
                     primaryStage.setScene(scene);
                     primaryStage.show();
                 } else {
@@ -105,7 +105,7 @@ public class FoxAndHoundsGame extends Application {
             if (radioButtonDialog.isButtonOK()) {
                 pos = radioButtonDialog.getPos();
                 fox.setNewPosition(7, pos);
-                scene = new Scene(getBoard(), 600, 600);
+                scene = new Scene(getBoard(primaryStage), 600, 600);
                 primaryStage.setScene(scene);
                 primaryStage.show();
             }
@@ -147,7 +147,7 @@ public class FoxAndHoundsGame extends Application {
         scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
-            scene.setRoot(getBoard());
+            scene.setRoot(getBoard(primaryStage));
             timer.play();
         });
 
@@ -195,7 +195,7 @@ public class FoxAndHoundsGame extends Application {
         scene.getStylesheets().add("style.css");
 
         buttonPlayAgain.setOnMouseClicked(e -> {
-            scene.setRoot(getBoard());
+            scene.setRoot(getBoard(primaryStage));
             timer.play();
         });
 
@@ -211,7 +211,7 @@ public class FoxAndHoundsGame extends Application {
         return getWinnerWindow;
     }
 
-    private VBox getBoard() {
+    private VBox getBoard(Stage primaryStage) {
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("options");
         menuBar.getMenus().addAll(menu, whoseTurn, timerLabel);
@@ -269,7 +269,7 @@ public class FoxAndHoundsGame extends Application {
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
                 if (file.getAbsolutePath().endsWith(".txt")) {
-                    open(file, stackPaneFields);
+                    open(file, stackPaneFields, primaryStage);
                 } else {
                     alertWrongExtension.showAndWait();
                 }
@@ -361,14 +361,17 @@ public class FoxAndHoundsGame extends Application {
         }
     }
 
-    private void open(File file, StackPane[][] stackPaneFields) {
+    private void open(File file, StackPane[][] stackPaneFields, Stage primaryStage) {
         try {
             deletePieces(stackPaneFields);
             Scanner lineScanner = null;
             try {
                 lineScanner = new Scanner(file);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
+                alertWrongDataEx.setHeaderText(null);
+                alertWrongDataEx.setContentText("FILE NOT FOUND!");
+                alertWrongDataEx.showAndWait();
             }
 
             int tmpRow;
@@ -394,6 +397,7 @@ public class FoxAndHoundsGame extends Application {
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
+
                     if (tmpType.equals("FOX")) {
                         fox.setNewPosition(tmpRow, tmpCol);
                         stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
@@ -403,19 +407,17 @@ public class FoxAndHoundsGame extends Application {
                         houndCount++;
                     }
                 }
-
             }
-        } catch (NumberFormatException numberFormatException) {
+        } catch (Exception exception) {
             Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
             alertWrongDataEx.setHeaderText(null);
             alertWrongDataEx.setContentText("WRONG DATA FORMAT!");
             alertWrongDataEx.showAndWait();
             deletePieces(stackPaneFields);
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 8; col++) {
-                    setStartBoard(stackPaneFields[row][col], row, col);
-                }
-            }
+            scene = new Scene(getStartWindow(primaryStage), 800, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            scene.getStylesheets().add("style.css");
         }
     }
 
@@ -430,19 +432,19 @@ public class FoxAndHoundsGame extends Application {
 
     private void setStartBoard(StackPane stackPaneField, int row, int col) {
         Piece piece = null;
-        if (row == 0 && col == 1) {
+        if (row == hound_01.getRowPosition() && col == hound_01.getColPosition()) {
             piece = hound_01;
         }
-        if (row == 0 && col == 3) {
+        if (row == hound_02.getRowPosition() && col == hound_02.getColPosition()) {
             piece = hound_02;
         }
-        if (row == 0 && col == 5) {
+        if (row == hound_03.getRowPosition() && col == hound_03.getColPosition()) {
             piece = hound_03;
         }
-        if (row == 0 && col == 7) {
+        if (row == hound_04.getRowPosition() && col == hound_04.getColPosition()) {
             piece = hound_04;
         }
-        if (row == 7 && col == pos) {
+        if (row == fox.getRowPosition() && col == fox.getColPosition()) {
             piece = fox;
         }
         if (piece != null) {
