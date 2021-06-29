@@ -105,6 +105,12 @@ public class FoxAndHoundsGame extends Application {
             if (radioButtonDialog.isButtonOK()) {
                 pos = radioButtonDialog.getPos();
                 fox.setNewPosition(7, pos);
+                hound_01.setNewPosition(0,1);
+                hound_02.setNewPosition(0,3);
+                hound_03.setNewPosition(0,5);
+                hound_04.setNewPosition(0,7);
+                timerInput[0] = 30;
+                lastMove[0] = hound_01;
                 scene = new Scene(getBoard(primaryStage), 600, 600);
                 primaryStage.setScene(scene);
                 primaryStage.show();
