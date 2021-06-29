@@ -88,10 +88,7 @@ public class FoxAndHoundsGame extends Application {
             File file = fileChooser.showOpenDialog(null);
             if (file != null) {
                 if (file.getAbsolutePath().endsWith(".txt")) {
-                    open(file, stackPaneFields, primaryStage);
-                    scene = new Scene(getBoard(primaryStage), 600, 600);
-                    primaryStage.setScene(scene);
-                    primaryStage.show();
+                    openStart(file, stackPaneFields, primaryStage);
                 } else {
                     alertWrongExtension.showAndWait();
                 }
@@ -105,10 +102,10 @@ public class FoxAndHoundsGame extends Application {
             if (radioButtonDialog.isButtonOK()) {
                 pos = radioButtonDialog.getPos();
                 fox.setNewPosition(7, pos);
-                hound_01.setNewPosition(0,1);
-                hound_02.setNewPosition(0,3);
-                hound_03.setNewPosition(0,5);
-                hound_04.setNewPosition(0,7);
+                hound_01.setNewPosition(0, 1);
+                hound_02.setNewPosition(0, 3);
+                hound_03.setNewPosition(0, 5);
+                hound_04.setNewPosition(0, 7);
                 timerInput[0] = 30;
                 lastMove[0] = hound_01;
                 scene = new Scene(getBoard(primaryStage), 600, 600);
@@ -418,6 +415,69 @@ public class FoxAndHoundsGame extends Application {
                     }
                 }
             }
+        } catch (Exception exception) {
+            Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
+            alertWrongDataEx.setHeaderText(null);
+            alertWrongDataEx.setContentText("WRONG DATA FORMAT!");
+            alertWrongDataEx.showAndWait();
+            deletePieces(stackPaneFields);
+            scene = new Scene(getStartWindow(primaryStage), 800, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            scene.getStylesheets().add("style.css");
+        }
+    }
+
+    private void openStart(File file, StackPane[][] stackPaneFields, Stage primaryStage) {
+        try {
+            deletePieces(stackPaneFields);
+            Scanner lineScanner = null;
+            try {
+                lineScanner = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
+                alertWrongDataEx.setHeaderText(null);
+                alertWrongDataEx.setContentText("FILE NOT FOUND!");
+                alertWrongDataEx.showAndWait();
+            }
+
+            int tmpRow;
+            int tmpCol;
+            String tmpType;
+            String tmpLine;
+            String[] tmpData;
+            int houndCount = 0;
+            while (lineScanner.hasNextLine()) {
+                tmpLine = lineScanner.nextLine();
+                tmpData = tmpLine.split(" ");
+                tmpType = tmpData[0];
+                if (tmpType.equals("last")) {
+                    if (tmpData[1].equals("FOX")) {
+                        lastMove[0] = fox;
+                        whoseTurn.setText(PieceType.HOUNDS.toString());
+                    } else {
+                        lastMove[0] = hounds[0];
+                        whoseTurn.setText(PieceType.FOX.toString());
+                    }
+                } else if (tmpType.equals("timer")) {
+                    timerInput[0] = Integer.parseInt(tmpData[1]);
+                } else {
+                    tmpRow = Integer.parseInt(tmpData[1]);
+                    tmpCol = Integer.parseInt(tmpData[2]);
+
+                    if (tmpType.equals("FOX")) {
+                        fox.setNewPosition(tmpRow, tmpCol);
+                        stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                    } else {
+                        hounds[houndCount].setNewPosition(tmpRow, tmpCol);
+                        stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
+                        houndCount++;
+                    }
+                }
+            }
+            scene = new Scene(getBoard(primaryStage), 600, 600);
+            primaryStage.setScene(scene);
+            primaryStage.show();
         } catch (Exception exception) {
             Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
             alertWrongDataEx.setHeaderText(null);
