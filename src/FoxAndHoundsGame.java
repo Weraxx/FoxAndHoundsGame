@@ -400,18 +400,26 @@ public class FoxAndHoundsGame extends Application {
                         whoseTurn.setText(PieceType.FOX.toString());
                     }
                 } else if (tmpType.equals("timer")) {
-                    timerInput[0] = Integer.parseInt(tmpData[1]);
+                    if (Integer.parseInt(tmpData[1]) <= 30) {
+                        timerInput[0] = Integer.parseInt(tmpData[1]);
+                    } else {
+                        throw new Exception();
+                    }
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
 
-                    if (tmpType.equals("FOX")) {
-                        fox.setNewPosition(tmpRow, tmpCol);
-                        stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                    if (tmpRow < 8 && tmpCol < 8) {
+                        if (tmpType.equals("FOX")) {
+                            fox.setNewPosition(tmpRow, tmpCol);
+                            stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                        } else {
+                            hounds[houndCount].setNewPosition(tmpRow, tmpCol);
+                            stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
+                            houndCount++;
+                        }
                     } else {
-                        hounds[houndCount].setNewPosition(tmpRow, tmpCol);
-                        stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
-                        houndCount++;
+                        throw new Exception();
                     }
                 }
             }
@@ -460,18 +468,26 @@ public class FoxAndHoundsGame extends Application {
                         whoseTurn.setText(PieceType.FOX.toString());
                     }
                 } else if (tmpType.equals("timer")) {
-                    timerInput[0] = Integer.parseInt(tmpData[1]);
+                    if (Integer.parseInt(tmpData[1]) <= 30) {
+                        timerInput[0] = Integer.parseInt(tmpData[1]);
+                    } else {
+                        throw new Exception();
+                    }
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
 
-                    if (tmpType.equals("FOX")) {
-                        fox.setNewPosition(tmpRow, tmpCol);
-                        stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                    if (tmpRow < 8 && tmpCol < 8) {
+                        if (tmpType.equals("FOX")) {
+                            fox.setNewPosition(tmpRow, tmpCol);
+                            stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
+                        } else {
+                            hounds[houndCount].setNewPosition(tmpRow, tmpCol);
+                            stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
+                            houndCount++;
+                        }
                     } else {
-                        hounds[houndCount].setNewPosition(tmpRow, tmpCol);
-                        stackPaneFields[tmpRow][tmpCol].getChildren().add(hounds[houndCount]);
-                        houndCount++;
+                        throw new Exception();
                     }
                 }
             }
