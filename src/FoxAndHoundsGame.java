@@ -260,8 +260,8 @@ public class FoxAndHoundsGame extends Application {
             File file = fileChooser.showSaveDialog(null);
             if (file != null) {
                 save(file, stackPaneFields);
-                timer.play();
             }
+            timer.play();
         });
 
         Alert alertWrongExtension = new Alert(Alert.AlertType.WARNING);
