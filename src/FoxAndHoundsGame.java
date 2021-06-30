@@ -68,7 +68,7 @@ public class FoxAndHoundsGame extends Application {
         Button startButton = new Button("START");
         startButton.setPrefSize(150, 50);
         startButton.setId("buttonStart");
-        VBox.setMargin(startButton, new Insets(85, 0, 0, 0));
+        VBox.setMargin(startButton, new Insets(40, 0, 0, 0));
         startWindow.setAlignment(Pos.CENTER);
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
         ImageView imageView = new ImageView(image);
