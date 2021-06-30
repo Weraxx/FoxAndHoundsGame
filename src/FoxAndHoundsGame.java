@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -95,6 +96,13 @@ public class FoxAndHoundsGame extends Application {
             }
         });
 
+        Button rulesButton = new Button("RULES");
+        rulesButton.setId("buttonStart");
+        rulesButton.setPrefSize(150, 50);
+        VBox.setMargin(rulesButton, new Insets(10, 0, 0, 0));
+
+        rulesButton.setOnAction(e -> scene.setRoot(getRulesWindow(primaryStage)));
+
         RadioButtonDialog radioButtonDialog = new RadioButtonDialog();
 
         startButton.setOnMouseClicked(mouseEvent -> {
@@ -114,10 +122,80 @@ public class FoxAndHoundsGame extends Application {
             }
         });
 
-        vBox.getChildren().addAll(startButton, openButton);
+        vBox.getChildren().addAll(startButton, openButton, rulesButton);
         startWindow.getChildren().addAll(imageView, vBox);
 
         return startWindow;
+    }
+
+    private ScrollPane getRulesWindow(Stage primaryStage) {
+
+        ScrollPane scrollPane = new ScrollPane();
+
+        VBox rulesWindow = new VBox();
+        rulesWindow.setAlignment(Pos.CENTER);
+
+        Background background = new Background(new BackgroundFill(Color.FLORALWHITE, null, null));
+        scrollPane.setBackground(background);
+        rulesWindow.setBackground(background);
+
+        Label textHeader_01 = new Label("INTRODUCTION OF FOX AND THE HOUNDS");
+        textHeader_01.setId("labelWinner");
+        VBox.setMargin(textHeader_01, new Insets(20, 0, 10, 0));
+        Text text_01 = new Text("Fox and the Hounds is an abstract strategy board game that uses checkers and an 8×8 grid.");
+        text_01.setId("text");
+        text_01.setWrappingWidth(500);
+
+        Label textHeader_02 = new Label("SETUP");
+        textHeader_02.setId("labelWinner");
+        VBox.setMargin(textHeader_02, new Insets(20, 0, 10, 0));
+        Text text_02 = new Text("Who is playing as the hounds shall place their four pieces on the dark spaces in their back row. The player who is playing as the fox can place their piece on one of the selected end fields in their back row.\n");
+        text_02.setId("text");
+        text_02.setWrappingWidth(500);
+
+        Label textHeader_03 = new Label("THE PLAY");
+        textHeader_03.setId("labelWinner");
+        VBox.setMargin(textHeader_03, new Insets(15, 0, 10, 0));
+        Text text_03 = new Text("The game begins with the fox making their move. The fox is allowed to move one space diagonally in any direction much like a king piece in checkers. After the fox makes their first move, the hounds can now take their turn. During the hounds turn, the player may choose one hound to move. Hounds move diagonally, but they may only move forward. Once a hound has reached the opposite end of the board it is stuck and can no longer move. Play like this continues until either side meets their win condition. In this game, neither the fox or the hounds are allowed to jump over or land on other pieces. They may only move into an adjacent space that is open. ");
+        text_03.setId("text");
+        text_03.setWrappingWidth(500);
+
+        HBox hBoxMovement = new HBox();
+        hBoxMovement.setAlignment(Pos.CENTER);
+        ImageView imageFoxMove = new ImageView("fox_move.png");
+        HBox.setMargin(imageFoxMove, new Insets(0,10,0,0));
+        ImageView imageHoundsMove = new ImageView("hounds_move.png");
+        hBoxMovement.getChildren().addAll(imageFoxMove,imageHoundsMove);
+        VBox.setMargin(hBoxMovement, new Insets(20, 0, 0, 20));
+
+        Label textHeader_04 = new Label("WINNING");
+        textHeader_04.setId("labelWinner");
+        VBox.setMargin(textHeader_04, new Insets(20, 0, 10, 0));
+        Text text_04 = new Text("If the fox is able to reach the opposite end of the board and end up in the hound’s starting row, the fox wins. If the hounds surround the fox in such a way that it can no longer move in any direction, the hounds win.");
+        text_04.setId("text");
+        text_04.setWrappingWidth(500);
+
+        HBox hBoxWinners = new HBox();
+        hBoxWinners.setAlignment(Pos.CENTER);
+        ImageView imageFoxWinner = new ImageView("fox_winner.jpg");
+        HBox.setMargin(imageFoxWinner, new Insets(0,10,0,0));
+        ImageView imageHoundsWinner = new ImageView("hounds_winner.jpg");
+        hBoxWinners.getChildren().addAll(imageFoxWinner,imageHoundsWinner);
+        VBox.setMargin(hBoxWinners, new Insets(20, 0, 0, 20));
+
+        Button backButton = new Button("BACK TO MENU");
+        backButton.setId("button");
+        VBox.setMargin(backButton, new Insets(20, 0, 20, 20));
+
+        backButton.setOnAction(e -> scene.setRoot(getStartWindow(primaryStage)));
+
+        rulesWindow.getChildren().addAll(textHeader_01, text_01, textHeader_02, text_02, textHeader_03, text_03, hBoxMovement, textHeader_04, text_04, hBoxWinners, backButton);
+
+        scrollPane.setContent(rulesWindow);
+        primaryStage.setResizable(false);
+        rulesWindow.setPrefWidth(800);
+
+        return scrollPane;
     }
 
     private VBox getFoxWinnerWindow(Stage primaryStage) {
@@ -297,6 +375,8 @@ public class FoxAndHoundsGame extends Application {
 
         board.setPrefSize(600, 600);
         boardWithMenuBar.getChildren().add(board);
+        primaryStage.setResizable(false);
+
         return boardWithMenuBar;
     }
 

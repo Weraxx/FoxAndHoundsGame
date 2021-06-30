@@ -27,3 +27,7 @@
 -fx-font: 18px "sans-serif";
 -fx-text-fill: "DARKRED";
 }
+
+#text{
+-fx-font: 16px "sans-serif";
+}
