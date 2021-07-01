@@ -3,7 +3,7 @@ import javafx.scene.shape.Circle;
 
 public class Piece extends Circle {
 
-    private PieceType type;
+    private final PieceType type;
     protected int row;
     protected int col;
 

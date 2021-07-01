@@ -51,6 +51,7 @@ public class FoxAndHoundsGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         scene = new Scene(getStartWindow(primaryStage), 800, 600);
         scene.getStylesheets().add("style.css");
         timer(primaryStage);
@@ -60,7 +61,9 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private StackPane getStartWindow(Stage primaryStage) {
+
         StackPane startWindow = new StackPane();
+        startWindow.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
@@ -69,7 +72,7 @@ public class FoxAndHoundsGame extends Application {
         startButton.setPrefSize(150, 50);
         startButton.setId("buttonStart");
         VBox.setMargin(startButton, new Insets(40, 0, 0, 0));
-        startWindow.setAlignment(Pos.CENTER);
+
         Image image = new Image("Game-of-Fox-and-Hounds.jpg");
         ImageView imageView = new ImageView(image);
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
@@ -100,11 +103,9 @@ public class FoxAndHoundsGame extends Application {
         rulesButton.setId("buttonStart");
         rulesButton.setPrefSize(150, 50);
         VBox.setMargin(rulesButton, new Insets(10, 0, 0, 0));
-
         rulesButton.setOnAction(e -> scene.setRoot(getRulesWindow(primaryStage)));
 
         RadioButtonDialog radioButtonDialog = new RadioButtonDialog();
-
         startButton.setOnMouseClicked(mouseEvent -> {
             radioButtonDialog.showAndWait();
             if (radioButtonDialog.isButtonOK()) {
@@ -163,9 +164,9 @@ public class FoxAndHoundsGame extends Application {
         HBox hBoxMovement = new HBox();
         hBoxMovement.setAlignment(Pos.CENTER);
         ImageView imageFoxMove = new ImageView("fox_move.png");
-        HBox.setMargin(imageFoxMove, new Insets(0,10,0,0));
+        HBox.setMargin(imageFoxMove, new Insets(0, 10, 0, 0));
         ImageView imageHoundsMove = new ImageView("hounds_move.png");
-        hBoxMovement.getChildren().addAll(imageFoxMove,imageHoundsMove);
+        hBoxMovement.getChildren().addAll(imageFoxMove, imageHoundsMove);
         VBox.setMargin(hBoxMovement, new Insets(20, 0, 0, 20));
 
         Label textHeader_04 = new Label("WINNING");
@@ -178,9 +179,9 @@ public class FoxAndHoundsGame extends Application {
         HBox hBoxWinners = new HBox();
         hBoxWinners.setAlignment(Pos.CENTER);
         ImageView imageFoxWinner = new ImageView("fox_winner.jpg");
-        HBox.setMargin(imageFoxWinner, new Insets(0,10,0,0));
+        HBox.setMargin(imageFoxWinner, new Insets(0, 10, 0, 0));
         ImageView imageHoundsWinner = new ImageView("hounds_winner.jpg");
-        hBoxWinners.getChildren().addAll(imageFoxWinner,imageHoundsWinner);
+        hBoxWinners.getChildren().addAll(imageFoxWinner, imageHoundsWinner);
         VBox.setMargin(hBoxWinners, new Insets(20, 0, 0, 20));
 
         Button backButton = new Button("BACK TO MENU");
@@ -199,6 +200,7 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private VBox getFoxWinnerWindow(Stage primaryStage) {
+
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
@@ -245,6 +247,7 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private VBox getHoundsWinnerWindow(Stage primaryStage) {
+
         VBox getWinnerWindow = new VBox();
         getWinnerWindow.setAlignment(Pos.CENTER);
 
@@ -273,8 +276,6 @@ public class FoxAndHoundsGame extends Application {
         VBox.setMargin(buttonBackToMenu, new Insets(10, 0, 0, 0));
         buttonPlayAgain.setAlignment(Pos.BOTTOM_CENTER);
 
-        scene.getStylesheets().add("style.css");
-
         buttonPlayAgain.setOnMouseClicked(e -> {
             scene.setRoot(getBoard(primaryStage));
             timer.play();
@@ -293,18 +294,17 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private VBox getBoard(Stage primaryStage) {
+
         MenuBar menuBar = new MenuBar();
         Menu menu = new Menu("options");
         menuBar.getMenus().addAll(menu, whoseTurn, timerLabel);
         MenuItem menuItemSave = new MenuItem("save");
-        MenuItem menuItemOpen = new MenuItem("open");
-        menu.getItems().addAll(menuItemSave, menuItemOpen);
-
-        KeyCodeCombination openKeyCode = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
-        menuItemOpen.setAccelerator(openKeyCode);
-
         KeyCodeCombination saveKeyCode = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
         menuItemSave.setAccelerator(saveKeyCode);
+        MenuItem menuItemOpen = new MenuItem("open");
+        KeyCodeCombination openKeyCode = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
+        menuItemOpen.setAccelerator(openKeyCode);
+        menu.getItems().addAll(menuItemSave, menuItemOpen);
 
         VBox boardWithMenuBar = new VBox(menuBar);
 
@@ -430,6 +430,9 @@ public class FoxAndHoundsGame extends Application {
 
     private void save(File file, StackPane[][] stackPaneFields) {
         PrintWriter printWriter;
+        Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
+        alertFileNotFoundException.setHeaderText(null);
+        alertFileNotFoundException.setContentText("File not found!");
         try {
             printWriter = new PrintWriter(file.getAbsolutePath());
             for (int row = 0; row < 8; row++) {
@@ -444,7 +447,7 @@ public class FoxAndHoundsGame extends Application {
             printWriter.print("timer " + timerInput[0]);
             printWriter.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            alertFileNotFoundException.showAndWait();
         }
     }
 
@@ -455,12 +458,11 @@ public class FoxAndHoundsGame extends Application {
             try {
                 lineScanner = new Scanner(file);
             } catch (FileNotFoundException e) {
-                Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
-                alertWrongDataEx.setHeaderText(null);
-                alertWrongDataEx.setContentText("FILE NOT FOUND!");
-                alertWrongDataEx.showAndWait();
+                Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
+                alertFileNotFoundException.setHeaderText(null);
+                alertFileNotFoundException.setContentText("File not found!");
+                alertFileNotFoundException.showAndWait();
             }
-
             int tmpRow;
             int tmpCol;
             String tmpType;
@@ -471,6 +473,7 @@ public class FoxAndHoundsGame extends Application {
                 tmpLine = lineScanner.nextLine();
                 tmpData = tmpLine.split(" ");
                 tmpType = tmpData[0];
+
                 if (tmpType.equals("last")) {
                     if (tmpData[1].equals("FOX")) {
                         lastMove[0] = fox;
@@ -488,7 +491,6 @@ public class FoxAndHoundsGame extends Application {
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
-
                     if (tmpRow < 8 && tmpCol < 8) {
                         if (tmpType.equals("FOX")) {
                             fox.setNewPosition(tmpRow, tmpCol);
@@ -523,12 +525,11 @@ public class FoxAndHoundsGame extends Application {
             try {
                 lineScanner = new Scanner(file);
             } catch (FileNotFoundException e) {
-                Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
-                alertWrongDataEx.setHeaderText(null);
-                alertWrongDataEx.setContentText("FILE NOT FOUND!");
-                alertWrongDataEx.showAndWait();
+                Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
+                alertFileNotFoundException.setHeaderText(null);
+                alertFileNotFoundException.setContentText("File not found!");
+                alertFileNotFoundException.showAndWait();
             }
-
             int tmpRow;
             int tmpCol;
             String tmpType;

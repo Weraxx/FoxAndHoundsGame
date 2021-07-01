@@ -1,3 +1,3 @@
 public enum PieceType {
-    FOX, HOUNDS;
+    FOX, HOUNDS
 }

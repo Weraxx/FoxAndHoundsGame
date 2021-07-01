@@ -6,9 +6,9 @@ import javafx.scene.paint.Color;
 
 public class BoardSquare extends Region {
 
-    private Color color;
-    private int boardSquareRow;
-    private int boardSquareCol;
+    private final Color color;
+    private final int boardSquareRow;
+    private final int boardSquareCol;
 
     public BoardSquare(Color color, int boardSquareRow, int boardSquareCol) {
         this.color = color;
