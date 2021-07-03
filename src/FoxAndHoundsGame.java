@@ -435,7 +435,7 @@ public class FoxAndHoundsGame extends Application {
         try {
             printWriter = new PrintWriter(file.getAbsolutePath());
             for (int row = 0; row < ROW_COUNT; row++) {
-                for (int col = 0; col < 8; col++) {
+                for (int col = 0; col < COL_COUNT; col++) {
                     if (ifContainPiece(stackPaneFields[row][col])) {
                         printWriter.print(deliverObjectPiece(stackPaneFields[row][col]));
                         printWriter.print("\r\n");
@@ -819,8 +819,8 @@ public class FoxAndHoundsGame extends Application {
         boolean areHoundsWinner = true;
         loop_2:
         if (piece != null && piece.getType() == PieceType.FOX) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
+            for (int i = 0; i < ROW_COUNT; i++) {
+                for (int j = 0; j < COL_COUNT; j++) {
                     if (isMovementPossibleFox(piece, piece.getRowPosition(), piece.getColPosition(), i, j)) {
                         areHoundsWinner = false;
                         break loop_2;
