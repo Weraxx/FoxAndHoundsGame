@@ -74,7 +74,7 @@ public class FoxAndHoundsGame extends Application {
         startButton.setId("buttonStart");
         VBox.setMargin(startButton, new Insets(40, 0, 0, 0));
 
-        ImageView imageView = new ImageView("Game-of-Fox-and-Hounds.jpg");
+        ImageView imageView = new ImageView("resources/Game-of-Fox-and-Hounds.jpg");
         imageView.fitHeightProperty().bind(startWindow.heightProperty());
         imageView.fitWidthProperty().bind(startWindow.widthProperty());
 
@@ -166,9 +166,9 @@ public class FoxAndHoundsGame extends Application {
 
         HBox hBoxMovement = new HBox();
         hBoxMovement.setAlignment(Pos.CENTER);
-        ImageView imageFoxMove = new ImageView("fox_move.png");
+        ImageView imageFoxMove = new ImageView("resources/fox_move.png");
         HBox.setMargin(imageFoxMove, new Insets(0, 10, 0, 0));
-        ImageView imageHoundsMove = new ImageView("hounds_move.png");
+        ImageView imageHoundsMove = new ImageView("resources/hounds_move.png");
         hBoxMovement.getChildren().addAll(imageFoxMove, imageHoundsMove);
         VBox.setMargin(hBoxMovement, new Insets(20, 0, 0, 20));
 
@@ -182,9 +182,9 @@ public class FoxAndHoundsGame extends Application {
 
         HBox hBoxWinners = new HBox();
         hBoxWinners.setAlignment(Pos.CENTER);
-        ImageView imageFoxWinner = new ImageView("fox_winner.jpg");
+        ImageView imageFoxWinner = new ImageView("resources/fox_winner.jpg");
         HBox.setMargin(imageFoxWinner, new Insets(0, 10, 0, 0));
-        ImageView imageHoundsWinner = new ImageView("hounds_winner.jpg");
+        ImageView imageHoundsWinner = new ImageView("resources/hounds_winner.jpg");
         hBoxWinners.getChildren().addAll(imageFoxWinner, imageHoundsWinner);
         VBox.setMargin(hBoxWinners, new Insets(20, 0, 0, 20));
 
@@ -216,7 +216,7 @@ public class FoxAndHoundsGame extends Application {
         labelWinner.setId("labelWinner");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
-        Image image = new Image("fox.png");
+        Image image = new Image("resources/fox.png");
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(400);
         imageView.setFitHeight(400);
@@ -263,7 +263,7 @@ public class FoxAndHoundsGame extends Application {
         labelWinner.setId("labelWinner");
         labelWinner.setAlignment(Pos.TOP_CENTER);
 
-        Image image = new Image("hounds.png");
+        Image image = new Image("resources/hounds.png");
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(400);
         imageView.setFitHeight(400);
