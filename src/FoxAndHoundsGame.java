@@ -149,14 +149,20 @@ public class FoxAndHoundsGame extends Application {
         Label textHeader_02 = new Label("SETUP");
         textHeader_02.setId("labelWinner");
         VBox.setMargin(textHeader_02, new Insets(20, 0, 10, 0));
-        Text text_02 = new Text("Who is playing as the hounds shall place their four pieces on the dark spaces in their back row. The player who is playing as the fox can place their piece on one of the selected end fields in their back row.\n");
+        Text text_02 = new Text("Who is playing as the hounds shall place their four pieces on the dark spaces in their back row. " +
+                "The player who is playing as the fox can place their piece on one of the selected end fields in their back row.");
         text_02.setId("text");
         text_02.setWrappingWidth(500);
 
         Label textHeader_03 = new Label("THE PLAY");
         textHeader_03.setId("labelWinner");
         VBox.setMargin(textHeader_03, new Insets(15, 0, 10, 0));
-        Text text_03 = new Text("The game begins with the fox making their move. The fox is allowed to move one space diagonally in any direction much like a king piece in checkers. After the fox makes their first move, the hounds can now take their turn. During the hounds turn, the player may choose one hound to move. Hounds move diagonally, but they may only move forward. Once a hound has reached the opposite end of the board it is stuck and can no longer move. Play like this continues until either side meets their win condition. In this game, neither the fox or the hounds are allowed to jump over or land on other pieces. They may only move into an adjacent space that is open. ");
+        Text text_03 = new Text("The game begins with the fox making their move. The fox is allowed to move one space diagonally in any direction much " +
+                "like a king piece in checkers. After the fox makes their first move, the hounds can now take their turn. During the hounds turn, " +
+                "the player may choose one hound to move. Hounds move diagonally, but they may only move forward. " +
+                "Once a hound has reached the opposite end of the board it is stuck and can no longer move. Play like this continues " +
+                "until either side meets their win condition. In this game, neither the fox or the hounds are allowed to jump over or land on other pieces. " +
+                "They may only move into an adjacent space that is open. ");
         text_03.setId("text");
         text_03.setWrappingWidth(500);
 
@@ -171,7 +177,8 @@ public class FoxAndHoundsGame extends Application {
         Label textHeader_04 = new Label("WINNING");
         textHeader_04.setId("labelWinner");
         VBox.setMargin(textHeader_04, new Insets(20, 0, 10, 0));
-        Text text_04 = new Text("If the fox is able to reach the opposite end of the board and end up in the hound’s starting row, the fox wins. If the hounds surround the fox in such a way that it can no longer move in any direction, the hounds win.");
+        Text text_04 = new Text("If the fox is able to reach the opposite end of the board and end up in the hound’s starting row, the fox wins. " +
+                "If the hounds surround the fox in such a way that it can no longer move in any direction, the hounds win.");
         text_04.setId("text");
         text_04.setWrappingWidth(500);
 
