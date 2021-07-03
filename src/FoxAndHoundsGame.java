@@ -27,17 +27,18 @@ public class FoxAndHoundsGame extends Application {
 
     private static final int COL_COUNT = 8;
     private static final int ROW_COUNT = 8;
-    private static final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
-    private static final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
-    private static final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
-    private static final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
-    private static final Piece[] lastMove = {hound_01};
-    private static final Piece[] hounds = {hound_01, hound_02, hound_03, hound_04};
-    private static int pos;
-    private static final Piece fox = new Piece(PieceType.FOX, 7, pos);
-    private static final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
+    private final Piece hound_01 = new Piece(PieceType.HOUNDS, 0, 1);
+    private final Piece hound_02 = new Piece(PieceType.HOUNDS, 0, 3);
+    private final Piece hound_03 = new Piece(PieceType.HOUNDS, 0, 5);
+    private final Piece hound_04 = new Piece(PieceType.HOUNDS, 0, 7);
+    private final Piece[] lastMove = {hound_01};
+    private final Piece[] hounds = {hound_01, hound_02, hound_03, hound_04};
+    private int pos;
+    private final Piece fox = new Piece(PieceType.FOX, 7, pos);
+    private final Piece[] pieces = {hound_01, hound_02, hound_03, hound_04, fox};
     private final Menu timerLabel = new Menu();
     private final Menu whoseTurn = new Menu();
+    private final int TIME_MAX = 30;
     private final int[] timerInput = {30};
     private final Timeline checkingWinner = new Timeline();
     private final Timeline timer = new Timeline();
@@ -83,9 +84,6 @@ public class FoxAndHoundsGame extends Application {
         VBox.setMargin(openButton, new Insets(10, 0, 0, 0));
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"));
-        Alert alertWrongExtension = new Alert(Alert.AlertType.WARNING);
-        alertWrongExtension.setHeaderText(null);
-        alertWrongExtension.setContentText("Wrong file extension");
         openButton.setOnAction(actionEvent -> {
             getBoard(primaryStage);
             File file = fileChooser.showOpenDialog(null);
@@ -93,7 +91,7 @@ public class FoxAndHoundsGame extends Application {
                 if (file.getAbsolutePath().endsWith(".txt")) {
                     openStart(file, stackPaneFields, primaryStage);
                 } else {
-                    alertWrongExtension.showAndWait();
+                    showErrorDialog("WRONG FILE EXTENSION!");
                 }
             }
         });
@@ -114,7 +112,7 @@ public class FoxAndHoundsGame extends Application {
                 hound_02.setNewPosition(0, 3);
                 hound_03.setNewPosition(0, 5);
                 hound_04.setNewPosition(0, 7);
-                timerInput[0] = 30;
+                timerInput[0] = TIME_MAX;
                 lastMove[0] = hound_01;
                 scene = new Scene(getBoard(primaryStage), 600, 600);
                 primaryStage.setScene(scene);
@@ -348,9 +346,6 @@ public class FoxAndHoundsGame extends Application {
             timer.play();
         });
 
-        Alert alertWrongExtension = new Alert(Alert.AlertType.WARNING);
-        alertWrongExtension.setHeaderText(null);
-        alertWrongExtension.setContentText("Wrong file extension");
         menuItemOpen.setOnAction(actionEvent -> {
             timer.stop();
             File file = fileChooser.showOpenDialog(null);
@@ -358,7 +353,7 @@ public class FoxAndHoundsGame extends Application {
                 if (file.getAbsolutePath().endsWith(".txt")) {
                     open(file, stackPaneFields, primaryStage);
                 } else {
-                    alertWrongExtension.showAndWait();
+                    showErrorDialog("WRONG FILE EXTENSION!");
                 }
             }
             timer.play();
@@ -399,8 +394,6 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void movementCheck(boolean[] ifLastClickOnPiece, Piece[] tmpPiece, StackPane stackPaneField, BoardSquare boardSquare) {
-        Alert movementWarning = new Alert(Alert.AlertType.WARNING);
-        movementWarning.setHeaderText(null);
         if (ifContainPiece(stackPaneField) && !ifLastClickOnPiece[0] && lastMove[0].getType() != deliverObjectPiece(stackPaneField).getType()) {
             ifLastClickOnPiece[0] = true;
             showPossibilities(boardSquares, stackPaneField, deliverObjectPiece(stackPaneField), boardSquare.getBoardSquareRow(), boardSquare.getBoardSquareCol());
@@ -412,7 +405,7 @@ public class FoxAndHoundsGame extends Application {
                 stackPaneFields[newRow][newCol].getChildren().add(tmpPiece[0]);
                 tmpPiece[0].setNewPosition(newRow, newCol);
                 lastMove[0] = deliverObjectPiece(stackPaneField);
-                timerInput[0] = 30;
+                timerInput[0] = TIME_MAX;
                 if (lastMove[0].getType() == PieceType.HOUNDS) {
                     whoseTurn.setText("turn: " + PieceType.FOX);
                 } else {
@@ -426,19 +419,15 @@ public class FoxAndHoundsGame extends Application {
             ifLastClickOnPiece[0] = false;
         } else {
             if (lastMove[0].getType() == PieceType.FOX) {
-                movementWarning.setContentText("HOUNDS TURN");
+                showErrorDialog("HOUNDS TURN");
             } else {
-                movementWarning.setContentText("FOX'S TURN");
+                showErrorDialog("FOX'S TURN");
             }
-            movementWarning.showAndWait();
         }
     }
 
     private void save(File file, StackPane[][] stackPaneFields) {
         PrintWriter printWriter;
-        Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
-        alertFileNotFoundException.setHeaderText(null);
-        alertFileNotFoundException.setContentText("File not found!");
         try {
             printWriter = new PrintWriter(file.getAbsolutePath());
             for (int row = 0; row < ROW_COUNT; row++) {
@@ -453,7 +442,7 @@ public class FoxAndHoundsGame extends Application {
             printWriter.print("timer " + timerInput[0]);
             printWriter.close();
         } catch (FileNotFoundException e) {
-            alertFileNotFoundException.showAndWait();
+            showErrorDialog("FILE NOT FOUND!");
         }
     }
 
@@ -464,10 +453,7 @@ public class FoxAndHoundsGame extends Application {
             try {
                 lineScanner = new Scanner(file);
             } catch (FileNotFoundException e) {
-                Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
-                alertFileNotFoundException.setHeaderText(null);
-                alertFileNotFoundException.setContentText("File not found!");
-                alertFileNotFoundException.showAndWait();
+                showErrorDialog("File not found!");
             }
             int tmpRow;
             int tmpCol;
@@ -489,7 +475,7 @@ public class FoxAndHoundsGame extends Application {
                         whoseTurn.setText(PieceType.FOX.toString());
                     }
                 } else if (tmpType.equals("timer")) {
-                    if (Integer.parseInt(tmpData[1]) <= 30) {
+                    if (Integer.parseInt(tmpData[1]) <= TIME_MAX) {
                         timerInput[0] = Integer.parseInt(tmpData[1]);
                     } else {
                         throw new Exception();
@@ -512,16 +498,20 @@ public class FoxAndHoundsGame extends Application {
                 }
             }
         } catch (Exception exception) {
-            Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
-            alertWrongDataEx.setHeaderText(null);
-            alertWrongDataEx.setContentText("WRONG DATA FORMAT!");
-            alertWrongDataEx.showAndWait();
+            showErrorDialog("WRONG DATA FORMAT!");
             deletePieces(stackPaneFields);
             scene = new Scene(getStartWindow(primaryStage), 800, 600);
             primaryStage.setScene(scene);
             primaryStage.show();
             scene.getStylesheets().add("style.css");
         }
+    }
+
+    private void showErrorDialog(String s) {
+        Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
+        alertWrongDataEx.setHeaderText(null);
+        alertWrongDataEx.setContentText(s);
+        alertWrongDataEx.showAndWait();
     }
 
     private void openStart(File file, StackPane[][] stackPaneFields, Stage primaryStage) {
@@ -531,10 +521,7 @@ public class FoxAndHoundsGame extends Application {
             try {
                 lineScanner = new Scanner(file);
             } catch (FileNotFoundException e) {
-                Alert alertFileNotFoundException = new Alert(Alert.AlertType.WARNING);
-                alertFileNotFoundException.setHeaderText(null);
-                alertFileNotFoundException.setContentText("File not found!");
-                alertFileNotFoundException.showAndWait();
+                showErrorDialog("FILE NOT FOUND!");
             }
             int tmpRow;
             int tmpCol;
@@ -555,7 +542,7 @@ public class FoxAndHoundsGame extends Application {
                         whoseTurn.setText(PieceType.FOX.toString());
                     }
                 } else if (tmpType.equals("timer")) {
-                    if (Integer.parseInt(tmpData[1]) <= 30) {
+                    if (Integer.parseInt(tmpData[1]) <= TIME_MAX) {
                         timerInput[0] = Integer.parseInt(tmpData[1]);
                     } else {
                         throw new Exception();
@@ -582,10 +569,7 @@ public class FoxAndHoundsGame extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception exception) {
-            Alert alertWrongDataEx = new Alert(Alert.AlertType.WARNING);
-            alertWrongDataEx.setHeaderText(null);
-            alertWrongDataEx.setContentText("WRONG DATA FORMAT!");
-            alertWrongDataEx.showAndWait();
+            showErrorDialog("WRONG DATA FORMAT!");
             deletePieces(stackPaneFields);
             scene = new Scene(getStartWindow(primaryStage), 800, 600);
             primaryStage.setScene(scene);
@@ -663,7 +647,7 @@ public class FoxAndHoundsGame extends Application {
                     lastMove[0] = hounds[(int) (Math.random() + 3)];
                     whoseTurn.setText("turn: " + PieceType.FOX);
                 }
-                timerInput[0] = 30;
+                timerInput[0] = TIME_MAX;
             }
         });
         timer.getKeyFrames().add(keyFrameTimer);
