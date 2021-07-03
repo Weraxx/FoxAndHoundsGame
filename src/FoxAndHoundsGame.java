@@ -434,7 +434,7 @@ public class FoxAndHoundsGame extends Application {
         alertFileNotFoundException.setContentText("File not found!");
         try {
             printWriter = new PrintWriter(file.getAbsolutePath());
-            for (int row = 0; row < 8; row++) {
+            for (int row = 0; row < ROW_COUNT; row++) {
                 for (int col = 0; col < 8; col++) {
                     if (ifContainPiece(stackPaneFields[row][col])) {
                         printWriter.print(deliverObjectPiece(stackPaneFields[row][col]));
@@ -490,7 +490,7 @@ public class FoxAndHoundsGame extends Application {
                 } else {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
-                    if (tmpRow < 8 && tmpCol < 8) {
+                    if (tmpRow < ROW_COUNT && tmpCol < COL_COUNT) {
                         if (tmpType.equals("FOX")) {
                             fox.setNewPosition(tmpRow, tmpCol);
                             stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
@@ -557,7 +557,7 @@ public class FoxAndHoundsGame extends Application {
                     tmpRow = Integer.parseInt(tmpData[1]);
                     tmpCol = Integer.parseInt(tmpData[2]);
 
-                    if (tmpRow < 8 && tmpCol < 8) {
+                    if (tmpRow < ROW_COUNT && tmpCol < COL_COUNT) {
                         if (tmpType.equals("FOX")) {
                             fox.setNewPosition(tmpRow, tmpCol);
                             stackPaneFields[tmpRow][tmpCol].getChildren().add(fox);
@@ -682,8 +682,8 @@ public class FoxAndHoundsGame extends Application {
     }
 
     private void deletePieces(StackPane[][] stackPaneFields) {
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
+        for (int row = 0; row < ROW_COUNT; row++) {
+            for (int col = 0; col < COL_COUNT; col++) {
                 if (stackPaneFields[row][col] != null) {
                     if (ifContainPiece(stackPaneFields[row][col])) {
                         stackPaneFields[row][col].getChildren().remove(1);
@@ -696,12 +696,12 @@ public class FoxAndHoundsGame extends Application {
     private void showPossibilities(BoardSquare[][] boardSquares, StackPane stackPaneField, Piece piece, int row, int col) {
         if (ifContainPiece(stackPaneField)) {
             if (piece.getType() == PieceType.FOX) {
-                if ((row + 1) < 8 && (col - 1) >= 0) {
+                if ((row + 1) < ROW_COUNT && (col - 1) >= 0) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
                     }
                 }
-                if ((row + 1) < 8 && (col + 1) < 8) {
+                if ((row + 1) < ROW_COUNT && (col + 1) < COL_COUNT) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col + 1])) {
                         boardSquares[row + 1][col + 1].highlightPossibilities();
                     }
@@ -711,18 +711,18 @@ public class FoxAndHoundsGame extends Application {
                         boardSquares[row - 1][col - 1].highlightPossibilities();
                     }
                 }
-                if ((col + 1) < 8 && (row - 1) >= 0) {
+                if ((col + 1) < COL_COUNT && (row - 1) >= 0) {
                     if (!ifContainPiece(stackPaneFields[row - 1][col + 1])) {
                         boardSquares[row - 1][col + 1].highlightPossibilities();
                     }
                 }
             } else {
-                if ((row + 1) < 8 && (col - 1) >= 0) {
+                if ((row + 1) < ROW_COUNT && (col - 1) >= 0) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col - 1])) {
                         boardSquares[row + 1][col - 1].highlightPossibilities();
                     }
                 }
-                if ((row + 1) < 8 && (col + 1) < 8) {
+                if ((row + 1) < ROW_COUNT && (col + 1) < COL_COUNT) {
                     if (!ifContainPiece(stackPaneFields[row + 1][col + 1])) {
                         boardSquares[row + 1][col + 1].highlightPossibilities();
                     }
@@ -784,8 +784,8 @@ public class FoxAndHoundsGame extends Application {
     private boolean isTheFoxWinner() {
         Piece piece = null;
         loop_2:
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
+        for (int row = 0; row < ROW_COUNT; row++) {
+            for (int col = 0; col < COL_COUNT; col++) {
                 if (stackPaneFields[row][col].getChildren().contains(pieces[4])) {
                     piece = pieces[4];
                     break loop_2;
@@ -806,8 +806,8 @@ public class FoxAndHoundsGame extends Application {
     private boolean areHoundsWinner() {
         Piece piece = null;
         loop_2:
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
+        for (int row = 0; row < ROW_COUNT; row++) {
+            for (int col = 0; col < COL_COUNT; col++) {
                 if (stackPaneFields[row][col].getChildren().contains(pieces[4])) {
                     piece = pieces[4];
                     break loop_2;
